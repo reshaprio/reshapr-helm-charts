@@ -1,0 +1,47 @@
+# Example values for development deployment
+# This configuration is suitable for local development and testing
+
+replicaCount: 1
+
+image:
+  repository: quay.io/reshapr/reshapr-proxy
+  tag: "nightly"
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+gateway:
+  # No prefix in dev, just use pod name
+  idPrefix: ""
+
+  # Development FQDNs
+  fqdns: "localhost,127.0.0.1"
+
+  # Development labels
+  labels: "env=dev"
+
+  # Control plane connection (assuming control plane is in same namespace)
+  controlPlane:
+    host: "reshapr-control-plane-ctrl"
+    port: 5555
+    token: "dev-token-change-me-in-production"
+    existingSecret: ""
+    tokenKey: "token"
+
+# No ingress for development (use port-forward)
+ingress:
+  enabled: false
+
+# No autoscaling for development
+autoscaling:
+  enabled: false
+
+# No PDB for development
+podDisruptionBudget:
+  enabled: false

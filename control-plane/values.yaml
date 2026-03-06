@@ -1,0 +1,230 @@
+# Default values for reshapr-ctrl-plane
+# This is a YAML-formatted file.
+
+# -- Global image pull secrets
+imagePullSecrets:
+  - name: ghcr-secret
+
+# -- Override the name of the chart
+nameOverride: ""
+# -- Override the full name of the release
+fullnameOverride: ""
+
+# =============================================================================
+# reshapr-ctrl component configuration
+# =============================================================================
+ctrl:
+  # -- Number of replicas for reshapr-ctrl
+  replicaCount: 1
+
+  image:
+    # -- Image repository for reshapr-ctrl
+    repository: quay.io/reshapr/reshapr-ctrl
+    # -- Image tag for reshapr-ctrl
+    tag: "nightly"
+    # -- Image pull policy
+    pullPolicy: Always
+
+  # -- Service account configuration
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: true
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  # -- Pod annotations
+  podAnnotations: {}
+
+  # -- Pod labels
+  podLabels: {}
+
+  # -- Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+  # -- Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  # -- Service configuration
+  service:
+    type: ClusterIP
+    port: 5555
+    targetPort: 5555
+
+  # -- Resources limits and requests
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  # -- Health check configuration
+  healthCheck:
+    # -- Enable liveness probe
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/live
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 2
+      failureThreshold: 3
+    # -- Enable readiness probe
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/ready
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 2
+      failureThreshold: 3
+
+  # -- Node selector
+  nodeSelector: {}
+
+  # -- Tolerations
+  tolerations: []
+
+  # -- Affinity configuration
+  affinity: {}
+
+  # -- Pod Disruption Budget configuration
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
+  # -- Extra environment variables
+  extraEnv: []
+
+  # -- Extra volume mounts
+  extraVolumeMounts: []
+
+  # -- Extra volumes
+  extraVolumes: []
+
+# =============================================================================
+# PostgreSQL configuration
+# =============================================================================
+# -- Embedded database configuration (when postgresql.enabled is true)
+postgresql:
+  # -- Enable embedded PostgreSQL
+  enabled: false
+
+  # -- Keep bitnami legacy and not new secure images because no tags.
+  image:
+    repository: bitnamilegacy/postgresql
+
+  # -- PostgreSQL authentication configuration (for embedded PostgreSQL)
+  auth:
+    username: reshapr
+    password: ""
+    database: reshapr
+    existingSecret: ""
+    secretKeys:
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "password"
+
+  # -- Primary PostgreSQL configuration
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+
+# -- External database configuration (when postgresql.enabled is false)
+externalDatabase:
+  # -- Database host
+  host: ""
+  # -- Database port
+  port: 5432
+  # -- Database name
+  database: reshapr
+  # -- Database username
+  username: reshapr
+  # -- Database password
+  password: ""
+  # -- Use existing secret for database credentials
+  existingSecret: ""
+  # -- Key in the existing secret for password
+  passwordKey: "password"
+
+# =============================================================================
+# Communication between components
+# =============================================================================
+# -- API key for communication between authz and ctrl components
+apiKey:
+  # -- The API key value (should be overridden in production)
+  value: ""
+  # -- Use existing secret for API key
+  existingSecret: ""
+  # -- Key in the existing secret for API key
+  key: "api-key"
+
+# =============================================================================
+# Keys for encrypting sensitive data (in database or authorization tokens)
+# =============================================================================
+# -- Encryption key for sensitive data (e.g., tokens) in ctrl + database component
+encryptionKey:
+  # -- The encryption key value (should be overridden in production)
+  value: ""
+  # -- Use existing secret for encryption key
+  existingSecret: ""
+  # -- Key in the existing secret for encryption key
+  key: "encryption-key"
+
+# -- JWT keys for signing and verifying tokens in ctrl component
+jwtKeys:
+  # -- Use existing secret for both private and public keys
+  existingSecret: ""
+  privateKey:
+    # -- The private key value for signing JWT tokens (should be overridden in production)
+    value: ""
+    # -- Key in the existing secret for private key
+    key: "private-key.pem"
+  publicKey:
+    # -- The public key value for verifying JWT tokens (should be overridden in production)
+    value: ""
+    # -- Key in the existing secret for public key
+    key: "public-key.pem"
+
+# =============================================================================
+# Ingress configuration
+# =============================================================================
+ingress:
+  # -- Enable ingress
+  enabled: false
+  # -- Ingress class name
+  className: ""
+  # -- Ingress annotations
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+
+  # -- Ingress hosts configuration for ctrl
+  ctrl:
+    host: ""
+    paths:
+      - path: /
+        pathType: Prefix
+
+  # -- TLS configuration
+  tls: []
+  #  - secretName: reshapr-tls
+  #    hosts:
+  #      - reshapr.example.com
+  #      - idp.reshapr.example.com

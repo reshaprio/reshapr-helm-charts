@@ -1,0 +1,124 @@
+# Example values for production deployment with external PostgreSQL
+# This configuration demonstrates best practices for a production environment
+
+# Use specific image tags instead of nightly in production
+ctrl:
+  enabled: true
+  replicaCount: 3
+
+  image:
+    repository: quay.io/reshapr/reshapr-ctrl
+    tag: "0.1.0"  # Use specific version tag
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  # Enable Pod Disruption Budget for HA
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+
+  # Distribute pods across nodes
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - ctrl
+            topologyKey: kubernetes.io/hostname
+
+  # Select specific nodes for control plane
+  nodeSelector:
+    node-role.kubernetes.io/worker: "true"
+
+  healthCheck:
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/live
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/ready
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+# Use external PostgreSQL for production
+postgresql:
+  enabled: false
+
+# External database configuration
+externalDatabase:
+  host: "postgresql-ha.database.svc.cluster.local"
+  port: 5432
+  database: "reshapr"
+  username: "reshapr"
+  password: ""  # Leave empty when using existingSecret
+  existingSecret: "reshapr-db-credentials"
+  passwordKey: "password"
+
+# Use existing secret for API key
+apiKey:
+  value: ""  # Leave empty when using existingSecret
+  existingSecret: "reshapr-api-key-secret"
+  key: "api-key"
+
+# =============================================================================
+# Use existing secret for encryption key for sensitive data (e.g., tokens) in ctrl + database component
+encryptionKey:
+  value: ""
+  existingSecret: "reshapr-encryption-key-secret"
+  key: "encryption-key"
+
+# JWT keys for signing and verifying tokens in ctrl component
+jwtKeys:
+  existingSecret: "reshapr-jwt-keys-secret"
+  privateKey:
+    value: ""
+    key: "private-key.pem"
+  publicKey:
+    value: ""
+    key: "public-key.pem"
+
+# Enable ingress with TLS
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+  ctrl:
+    host: "app.reshapr.example.com"
+    paths:
+      - path: /
+        pathType: Prefix
+
+  tls:
+    - secretName: reshapr-ctrl-tls
+      hosts:
+        - app.reshapr.example.com
+
+# Image pull secrets for private registry
+imagePullSecrets:
+  - name: ghcr-pull-secret

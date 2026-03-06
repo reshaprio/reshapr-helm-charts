@@ -1,0 +1,30 @@
+apiVersion: v2
+name: reshapr-control-plane
+description: Reshapr - Control Plane (reshapr-ctrl and optional postgresql components)
+
+type: application
+version: 0.1.0
+appVersion: 0.0.1
+keywords:
+  - mcp
+  - api
+  - control-plane
+  - reshapr
+
+home: https://reshapr.io
+sources:
+  - http://github.com/reshaprio/reshapr/
+  - https://reshapr.io
+maintainers:
+  - name: Laurent Broudoux
+    email: laurent.broudoux@gmail.com
+icon: https://reshapr.io/assets/images/image01.jpg?v=448586e6
+
+kubeVersion: '>=1.25.0-0'
+
+dependencies:
+  - name: postgresql
+    version: "16.7.27"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+    alias: postgresql

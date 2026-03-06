@@ -1,0 +1,118 @@
+# Example values for production deployment with HA and autoscaling
+# This configuration demonstrates best practices for a production environment
+
+replicaCount: 3
+
+image:
+  repository: quay.io/reshapr/reshapr-proxy
+  tag: "0.1.0"  # Use specific version tag
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+gateway:
+  # Use prefix for better identification in multi-cluster environments
+  idPrefix: "prod-gateway"
+
+  # Production FQDNs
+  fqdns: "mcp.reshapr.example.com"
+
+  # Production labels
+  labels: "env=production,region=eu-west-1,cluster=prod-01"
+
+  # Control plane connection
+  controlPlane:
+    host: "reshapr-control-plane-ctrl.reshapr-system.svc.cluster.local"
+    port: 5555
+    token: ""  # Leave empty when using existingSecret
+    existingSecret: "reshapr-gateway-token"
+    tokenKey: "token"
+
+# Enable ingress with TLS
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+    - host: mcp.reshapr.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: reshapr-gateway-tls
+      hosts:
+        - mcp.reshapr.example.com
+
+# Enable autoscaling for production
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Enable PDB when not using autoscaling
+podDisruptionBudget:
+  enabled: false  # Disabled when autoscaling is enabled
+  minAvailable: 2
+
+# Distribute pods across nodes
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - reshapr-gateway
+          topologyKey: kubernetes.io/hostname
+
+# Node selector for gateway nodes
+nodeSelector:
+  node-role.kubernetes.io/worker: "true"
+
+# Health check configuration
+healthCheck:
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /q/health/live
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /q/health/ready
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Enable ServiceMonitor for Prometheus
+serviceMonitor:
+  enabled: true
+  additionalLabels:
+    prometheus: kube-prometheus
+  interval: 30s
+  scrapeTimeout: 10s
+
+# Image pull secrets for private registry
+imagePullSecrets:
+  - name: ghcr-pull-secret

@@ -1,0 +1,19 @@
+{{- if .Values.ctrl.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "reshapr-ctrl.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "reshapr-ctrl.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.ctrl.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.ctrl.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.ctrl.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.ctrl.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "reshapr-ctrl.selectorLabels" . | nindent 6 }}
+{{- end }}

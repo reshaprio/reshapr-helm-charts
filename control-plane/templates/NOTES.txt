@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "reshapr-ctrl-plane.fullname" . }}-notes
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "reshapr-ctrl-plane.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+data:
+  notes.txt: |
+    1. Get the application URL by running these commands:
+    {{- if .Values.ingress.enabled }}
+    {{- if .Values.ctrl.enabled }}
+    {{- if .Values.ingress.ctrl.host }}
+      Control Plane API: {{ if .Values.ingress.tls }}https{{ else }}http{{ end }}://{{ .Values.ingress.ctrl.host }}
+    {{- end }}
+    {{- end }}
+    {{- else }}
+    {{- if .Values.ctrl.enabled }}
+      export CTRL_POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "reshapr-ctrl-plane.name" . }},app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/component=ctrl" -o jsonpath="{.items[0].metadata.name}")
+      echo "Visit http://127.0.0.1:8080 to use reshapr-ctrl"
+      kubectl --namespace {{ .Release.Namespace }} port-forward $CTRL_POD_NAME 8080:{{ .Values.ctrl.service.port }}
+    {{- end }}
+    {{- end }}
+
+    2. Database connection:
+    {{- if .Values.postgresql.enabled }}
+      Using embedded PostgreSQL database
+    {{- else }}
+      Using external database at {{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}
+    {{- end }}

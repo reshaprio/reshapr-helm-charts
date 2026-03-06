@@ -1,0 +1,51 @@
+# Example values for development/testing with embedded PostgreSQL
+# This configuration is suitable for local development and testing
+
+ctrl:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: quay.io/reshapr/reshapr-ctrl
+    tag: "nightly"
+    pullPolicy: Always
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  healthCheck:
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+
+# Use embedded PostgreSQL for development
+postgresql:
+  enabled: true
+  auth:
+    username: reshapr
+    password: "reshapr-dev-password"
+    database: reshapr
+  primary:
+    persistence:
+      enabled: true
+      size: 2Gi
+
+# API key for development
+apiKey:
+  value: "dev-api-key-change-me-in-production"
+
+# Encryption key for development
+encryptionKey:
+  value: "dev-encryption-key-change-me-in-production"
+
+# No ingress, use port-forward for local development
+ingress:
+  enabled: false

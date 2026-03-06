@@ -1,0 +1,25 @@
+apiVersion: v2
+name: reshapr-proxy
+description: Reshapr - Gateway (Data Plane)
+
+type: application
+version: 0.1.0
+appVersion: 0.0.1
+keywords:
+  - mcp
+  - api
+  - data-plane
+  - gateway
+  - reshapr
+
+home: https://reshapr.io
+sources:
+  - http://github.com/reshaprio/reshapr/
+  - https://reshapr.io
+maintainers:
+  - name: Laurent Broudoux
+    email: laurent.broudoux@gmail.com
+icon: https://reshapr.io/assets/images/image01.jpg?v=448586e6
+
+
+kubeVersion: '>=1.25.0-0'

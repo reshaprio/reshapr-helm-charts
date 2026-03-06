@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "reshapr-ctrl.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "reshapr-ctrl.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.ctrl.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "reshapr-ctrl.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.ctrl.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "reshapr-ctrl.labels" . | nindent 8 }}
+        {{- with .Values.ctrl.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "reshapr-ctrl.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.ctrl.podSecurityContext | nindent 8 }}
+      containers:
+        - name: reshapr-ctrl
+          securityContext:
+            {{- toYaml .Values.ctrl.securityContext | nindent 12 }}
+          image: "{{ .Values.ctrl.image.repository }}:{{ .Values.ctrl.image.tag }}"
+          imagePullPolicy: {{ .Values.ctrl.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.ctrl.service.targetPort }}
+              protocol: TCP
+            - name: hazelcast
+              containerPort: 5556
+              protocol: TCP
+          env:
+            - name: QUARKUS_PROFILE
+              value: prod
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: "jdbc:postgresql://{{ include "reshapr-ctrl-plane.databaseHost" . }}:{{ include "reshapr-ctrl-plane.databasePort" . }}/{{ include "reshapr-ctrl-plane.databaseName" . }}"
+            - name: QUARKUS_DATASOURCE_USERNAME
+              value: "{{ include "reshapr-ctrl-plane.databaseUsername" . }}"
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-ctrl-plane.databaseSecretName" . }}
+                  key: {{ include "reshapr-ctrl-plane.databaseSecretKey" . }}
+            - name: HZ_NETWORK_JOIN_KUBERNETES_ENABLED
+              value: "true"
+            - name: HZ_NETWORK_JOIN_KUBERNETES_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: HZ_NETWORK_JOIN_KUBERNETES_SERVICENAME
+              value: {{ include "reshapr-ctrl.fullname" . }}-hz
+            - name: HZ_CLUSTERNAME
+              value: {{ include "reshapr-ctrl.fullname" . }}-cluster
+            - name: RESHAPR_CTRL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-ctrl-plane.apiKeySecretName" . }}
+                  key: {{ .Values.apiKey.key }}
+            - name: RESHAPR_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-ctrl-plane.encryptionKeySecretName" . }}
+                  key: {{ .Values.encryptionKey.key }}
+            {{- if or .Values.jwtKeys.existingSecret .Values.jwtKeys.privateKey.value }}
+            - name: SMALLRYE_JWT_SIGN_KEY_LOCATION
+              value: /deployment/config/keys/{{ .Values.jwtKeys.privateKey.key }}
+            - name: MP_JWT_VERIFY_PUBLICKEY_LOCATION
+              value: /deployment/config/keys/{{ .Values.jwtKeys.publicKey.key }}
+            {{- end }}
+            {{- with .Values.ctrl.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.ctrl.healthCheck.livenessProbe.enabled }}
+          livenessProbe:
+            {{- with .Values.ctrl.healthCheck.livenessProbe.httpGet }}
+            httpGet:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.ctrl.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ctrl.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.ctrl.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.ctrl.healthCheck.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.ctrl.healthCheck.readinessProbe.enabled }}
+          readinessProbe:
+            {{- with .Values.ctrl.healthCheck.readinessProbe.httpGet }}
+            httpGet:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.ctrl.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.ctrl.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.ctrl.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.ctrl.healthCheck.readinessProbe.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.ctrl.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- if or .Values.jwtKeys.existingSecret .Values.jwtKeys.privateKey.value }}
+            - name: jwt-keys
+              mountPath: /deployment/config/keys
+              readOnly: true
+            {{- end }}
+            {{- with .Values.ctrl.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- if or .Values.jwtKeys.existingSecret .Values.jwtKeys.privateKey.value }}
+        - name: jwt-keys
+          secret:
+            secretName: {{ include "reshapr-ctrl-plane.jwtKeysSecretName" . }}
+        {{- end }}
+        {{- with .Values.ctrl.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.ctrl.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ctrl.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ctrl.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
