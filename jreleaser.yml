@@ -21,4 +21,6 @@ release:
 files:
   active: ALWAYS
   artifacts:
-    - path: packaged/*.tgz
+    - path: 'packaged/reshapr-control-plane-{{projectVersion}}.tgz'
+    - path: 'packaged/reshapr-proxy-{{projectVersion}}.tgz'
+
