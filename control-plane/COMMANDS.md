@@ -9,7 +9,6 @@ helm install reshapr-control-plane ./control-plane \
   --namespace reshapr-system \
   --set postgresql.enabled=true \
   --set postgresql.auth.password=admin \
-  --set postgresqlauthz.enabled=true \
   --set apiKey.value=dev-api-key-change-me-in-production \
   --set encryptionKey.value=dev-encryption-key-change-me-in-production
 ```
