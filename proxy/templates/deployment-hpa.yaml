@@ -59,10 +59,8 @@ spec:
               value: {{ .Values.gateway.controlPlane.host | quote }}
             - name: RESHAPR_CTRL_PORT
               value: {{ .Values.gateway.controlPlane.port | quote }}
-            {{- if not .Values.gateway.controlPlane.tlsPlainText }}
             - name: RESHAPR_CTRL_TLS_PLAINTEXT
-              value: false
-            {{- end }}
+              value: {{ .Values.gateway.controlPlane.tlsPlainText | quote }}
             - name: RESHAPR_CTRL_TOKEN
               valueFrom:
                 secretKeyRef:
