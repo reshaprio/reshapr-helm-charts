@@ -9,9 +9,9 @@ spec:
   type: {{ .Values.ctrl.service.type }}
   ports:
     - port: {{ .Values.ctrl.service.port }}
-      targetPort: http
+      targetPort: http2
       protocol: TCP
-      name: http
+      name: http2
   selector:
     {{- include "reshapr-ctrl.selectorLabels" . | nindent 4 }}
 ---
@@ -26,8 +26,8 @@ spec:
   type: {{ .Values.ctrl.service.type }}
   ports:
     - port: 5556
-      targetPort: hazelcast
+      targetPort: http2-hazelcast
       protocol: TCP
-      name: hazelcast
+      name: http2-hazelcast
   selector:
     {{- include "reshapr-ctrl.selectorLabels" . | nindent 4 }}

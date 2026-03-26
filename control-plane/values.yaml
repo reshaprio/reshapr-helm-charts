@@ -78,7 +78,7 @@ ctrl:
       enabled: true
       httpGet:
         path: /q/health/live
-        port: http
+        port: http2
       initialDelaySeconds: 10
       periodSeconds: 10
       timeoutSeconds: 2
@@ -88,7 +88,7 @@ ctrl:
       enabled: true
       httpGet:
         path: /q/health/ready
-        port: http
+        port: http2
       initialDelaySeconds: 10
       periodSeconds: 10
       timeoutSeconds: 2
