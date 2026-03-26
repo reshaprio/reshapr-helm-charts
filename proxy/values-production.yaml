@@ -24,7 +24,7 @@ gateway:
   fqdns: "mcp.reshapr.example.com"
 
   # Production labels
-  labels: "env=production,region=eu-west-1,cluster=prod-01"
+  labels: "env=production;region=eu-west-1;cluster=prod-01"
 
   # Control plane connection
   controlPlane:

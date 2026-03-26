@@ -216,7 +216,7 @@ helm upgrade reshapr-proxy . \
 helm upgrade reshapr-proxy . \
   --namespace reshapr-proxies \
   --reuse-values \
-  --set gateway.labels='env=production,region=eu-west-1,version=v2'
+  --set gateway.labels='env=production;region=eu-west-1;version=v2'
 
 # Update control plane host
 helm upgrade reshapr-proxy . \
@@ -353,14 +353,14 @@ helm install reshapr-proxy-eu . \
   -n reshapr-proxies \
   --set gateway.idPrefix='eu-west-1' \
   --set gateway.fqdns='mcp-eu.example.com' \
-  --set gateway.labels='env=prod,region=eu-west-1'
+  --set gateway.labels='env=prod;region=eu-west-1'
 
 # US Gateway
 helm install reshapr-proxy-us . \
   -n reshapr-proxies \
   --set gateway.idPrefix='us-east-1' \
   --set gateway.fqdns='mcp-us.example.com' \
-  --set gateway.labels='env=prod,region=us-east-1'
+  --set gateway.labels='env=prod;region=us-east-1'
 
 # List all gateways
 helm list -n reshapr-proxies

@@ -123,8 +123,8 @@ gateway:
   # -- Gateway FQDNs (comma-separated list)
   fqdns: ""
 
-  # -- Gateway labels (comma-separated key=value pairs)
-  labels: "env=production"
+  # -- Gateway labels (semi-colon separated key=value pairs)
+  labels: "env=dev;team=reshapr"
 
   # -- Control plane configuration
   controlPlane:

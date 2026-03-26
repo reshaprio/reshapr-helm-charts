@@ -86,7 +86,7 @@ The following table lists the configurable parameters of the Reshapr Gateway cha
 |-----------|-------------|---------|
 | `gateway.idPrefix` | Gateway ID prefix (combined with pod name) | `""` |
 | `gateway.fqdns` | Gateway FQDNs (comma-separated) | `""` |
-| `gateway.labels` | Gateway labels (comma-separated key=value) | `env=production` |
+| `gateway.labels` | Gateway labels (semi-colon -separated key=value) | `env=dev;team=reshapr` |
 | `gateway.controlPlane.host` | Control plane host | `reshapr-control-plane-ctrl` |
 | `gateway.controlPlane.port` | Control plane port | `5555` |
 | `gateway.controlPlane.token` | Control plane token | `""` |
@@ -145,7 +145,7 @@ replicaCount: 1
 
 gateway:
   fqdns: "mcp.example.com"
-  labels: "env=dev,region=us-east-1"
+  labels: "env=dev;region=us-east-1"
   controlPlane:
     host: "reshapr-ctrl.reshapr-system.svc.cluster.local"
     port: 5555
@@ -164,7 +164,7 @@ autoscaling:
 gateway:
   idPrefix: "prod-gateway"
   fqdns: "mcp.example.com,api.mcp.example.com"
-  labels: "env=production,cluster=prod-01"
+  labels: "env=production;cluster=prod-01"
   
 affinity:
   podAntiAffinity:
@@ -221,7 +221,7 @@ serviceMonitor:
 gateway:
   idPrefix: "eu-west-1"
   fqdns: "mcp-eu.reshapr.example.com"
-  labels: "env=production,region=eu-west-1"
+  labels: "env=production;region=eu-west-1"
 
 nodeSelector:
   topology.kubernetes.io/region: eu-west-1
@@ -231,7 +231,7 @@ nodeSelector:
 gateway:
   idPrefix: "us-east-1"
   fqdns: "mcp-us.reshapr.example.com"
-  labels: "env=production,region=us-east-1"
+  labels: "env=production;region=us-east-1"
 
 nodeSelector:
   topology.kubernetes.io/region: us-east-1

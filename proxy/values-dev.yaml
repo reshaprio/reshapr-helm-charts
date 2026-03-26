@@ -24,7 +24,7 @@ gateway:
   fqdns: "localhost,127.0.0.1"
 
   # Development labels
-  labels: "env=dev"
+  labels: "env=dev;team=reshapr"
 
   # Control plane connection (assuming control plane is in same namespace)
   controlPlane:
