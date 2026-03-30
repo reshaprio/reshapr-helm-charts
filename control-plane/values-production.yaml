@@ -14,10 +14,10 @@ ctrl:
   resources:
     limits:
       cpu: 2000m
-      memory: 1Gi
+      memory: 2Gi
     requests:
       cpu: 500m
-      memory: 512Mi
+      memory: 2Gi
 
   # Enable Pod Disruption Budget for HA
   podDisruptionBudget:

@@ -15,6 +15,6 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: http
       protocol: TCP
-      name: http
+      name: http2
   selector:
     {{- include "reshapr-proxy.selectorLabels" . | nindent 4 }}
