@@ -36,10 +36,10 @@ spec:
           image: "{{ .Values.ctrl.image.repository }}:{{ .Values.ctrl.image.tag }}"
           imagePullPolicy: {{ .Values.ctrl.image.pullPolicy }}
           ports:
-            - name: http2
+            - name: http
               containerPort: {{ .Values.ctrl.service.targetPort }}
               protocol: TCP
-            - name: http2-hazelcast
+            - name: hazelcast
               containerPort: 5556
               protocol: TCP
           env:

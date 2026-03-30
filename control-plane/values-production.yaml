@@ -14,10 +14,10 @@ ctrl:
   resources:
     limits:
       cpu: 2000m
-      memory: 1Gi
+      memory: 2Gi
     requests:
       cpu: 500m
-      memory: 512Mi
+      memory: 2Gi
 
   # Enable Pod Disruption Budget for HA
   podDisruptionBudget:
@@ -47,7 +47,7 @@ ctrl:
       enabled: true
       httpGet:
         path: /q/health/live
-        port: http2
+        port: http
       initialDelaySeconds: 30
       periodSeconds: 10
       timeoutSeconds: 3
@@ -56,7 +56,7 @@ ctrl:
       enabled: true
       httpGet:
         path: /q/health/ready
-        port: http2
+        port: http
       initialDelaySeconds: 30
       periodSeconds: 10
       timeoutSeconds: 3
