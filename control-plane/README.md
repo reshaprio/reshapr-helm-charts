@@ -86,7 +86,7 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 |------------------------------------|------------------------------|---------------------------------|
 | `ctrl.enabled`                     | Enable reshapr-ctrl component | `true`                          |
 | `ctrl.replicaCount`                | Number of replicas           | `1`                             |
-| `ctrl.image.repository`            | Image repository             | `quay.io/reshapr/reshapr-ctrl` |
+| `ctrl.image.repository`            | Image repository             | `registry.reshapr.io/reshapr/reshapr-ctrl` |
 | `ctrl.image.tag`                   | Image tag                    | `nightly`                       |
 | `ctrl.image.pullPolicy`            | Image pull policy            | `IfNotPresent`                  |
 | `ctrl.serviceAccount.create`       | Create service account       | `true`                          |

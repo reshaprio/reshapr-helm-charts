@@ -68,7 +68,7 @@ The following table lists the configurable parameters of the Reshapr Gateway cha
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of replicas | `1` |
-| `image.repository` | Image repository | `quay.io/resphar/reshapr-proxy` |
+| `image.repository` | Image repository | `registry.reshapr.io/resphar/reshapr-proxy` |
 | `image.tag` | Image tag | `nightly` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |

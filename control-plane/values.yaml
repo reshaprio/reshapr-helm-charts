@@ -19,7 +19,7 @@ ctrl:
 
   image:
     # -- Image repository for reshapr-ctrl
-    repository: quay.io/reshapr/reshapr-ctrl
+    repository: registry.reshapr.io/reshapr/reshapr-ctrl
     # -- Image tag for reshapr-ctrl
     tag: "nightly"
     # -- Image pull policy

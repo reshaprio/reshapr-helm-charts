@@ -19,7 +19,7 @@ replicaCount: 1
 
 image:
   # -- Image repository for reshapr-proxy
-  repository: quay.io/reshapr/reshapr-proxy
+  repository: registry.reshapr.io/reshapr/reshapr-proxy
   # -- Image tag for reshapr-proxy
   tag: "nightly"
   # -- Image pull policy
