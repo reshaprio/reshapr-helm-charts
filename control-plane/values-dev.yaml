@@ -6,7 +6,7 @@ ctrl:
   replicaCount: 1
 
   image:
-    repository: quay.io/reshapr/reshapr-ctrl
+    repository: registry.reshapr.io/reshapr/reshapr-ctrl
     tag: "nightly"
     pullPolicy: Always
 

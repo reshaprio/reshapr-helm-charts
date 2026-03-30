@@ -7,7 +7,7 @@ ctrl:
   replicaCount: 3
 
   image:
-    repository: quay.io/reshapr/reshapr-ctrl
+    repository: registry.reshapr.io/reshapr/reshapr-ctrl
     tag: "0.1.0"  # Use specific version tag
     pullPolicy: IfNotPresent
 
