@@ -14,7 +14,7 @@ spec:
     matchLabels:
       {{- include "reshapr-proxy.selectorLabels" . | nindent 6 }}
   endpoints:
-    - port: http2
+    - port: http
       path: /q/metrics
       interval: {{ .Values.serviceMonitor.interval }}
       scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}

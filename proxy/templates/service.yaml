@@ -13,7 +13,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http2
+      targetPort: http
       protocol: TCP
       name: http2
   selector:

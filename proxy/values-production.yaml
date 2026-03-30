@@ -90,7 +90,7 @@ healthCheck:
     enabled: true
     httpGet:
       path: /q/health/live
-      port: http2
+      port: http
     initialDelaySeconds: 30
     periodSeconds: 10
     timeoutSeconds: 3
@@ -99,7 +99,7 @@ healthCheck:
     enabled: true
     httpGet:
       path: /q/health/ready
-      port: http2
+      port: http
     initialDelaySeconds: 30
     periodSeconds: 10
     timeoutSeconds: 3
