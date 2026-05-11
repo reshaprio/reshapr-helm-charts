@@ -49,7 +49,6 @@ helm install reshapr-control-plane ./control-plane \
   --create-namespace \
   --set postgresql.enabled=true \
   --set postgresql.auth.password=<postgres-password> \
-  --set authz.admin.password=<keycloak-admin-password> \
   --set apiKey.value=<your-api-key>
 ```
 
@@ -163,7 +162,6 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 | `ingress.enabled`    | Enable ingress     | `false`  |
 | `ingress.className`  | Ingress class name | `""`     |
 | `ingress.ctrl.host`  | Hostname for ctrl  | `""`     |
-| `ingress.authz.host` | Hostname for authz | `""`     |
 | `ingress.tls`        | TLS configuration  | `[]`     |
 
 ## Examples
@@ -201,14 +199,6 @@ externalDatabase:
 
 ```yaml
 ctrl:
-  nodeSelector:
-    node-role.kubernetes.io/control-plane: "true"
-  tolerations:
-    - key: "node-role.kubernetes.io/control-plane"
-      operator: "Exists"
-      effect: "NoSchedule"
-
-authz:
   nodeSelector:
     node-role.kubernetes.io/control-plane: "true"
   tolerations:
@@ -254,9 +244,6 @@ kubectl get pods -n reshapr-system -l app.kubernetes.io/instance=reshapr-control
 ```bash
 # reshapr-ctrl logs
 kubectl logs -n reshapr-system -l app.kubernetes.io/component=ctrl
-
-# reshapr-authz logs
-kubectl logs -n reshapr-system -l app.kubernetes.io/component=authz
 ```
 
 ### Check database connectivity
