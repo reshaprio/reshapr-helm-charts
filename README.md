@@ -25,16 +25,17 @@ This repository contains two Helm charts:
 helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.4
 
 helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.4 \
-  --create-namespace --namespace reshapr-system \ 
+  --create-namespace --namespace reshapr-system \
   --set postgresql.enabled=true \
-  --set postgresql.auth.password=admin \       
-  --set postgresqlauthz.enabled=true \
+  --set postgresql.auth.password=admin \
   --set apiKey.value=dev-api-key-change-me-in-production \
   --set encryptionKey.value=dev-encryption-key-change-me-in-production \
   --set admin.nameValue=admin \
   --set admin.passwordValue=password \
   --set admin.emailValue=reshapr@example.com \
-  --set admin.defaultGatewayTokensValue=my-super-secret-token-xyz
+  --set admin.defaultGatewayTokensValue=my-super-secret-token-xyz \
+  --set ingress.enabled=true \
+  --set ingress.ctrl.host=reshapr.acme.loc
 ``` 
 
 ### reShapr proxy
