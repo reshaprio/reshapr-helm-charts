@@ -7,9 +7,9 @@ Helm Charts for installing reShapr components on Kubernetes
 
 ## Build Status
 
-Latest released version is `0.0.3`.
+Latest released version is `0.0.4`.
 
-Current development version is `0.0.4`.
+Current development version is `0.0.5`.
 
 ## How to use them?
 
@@ -22,9 +22,9 @@ This repository contains two Helm charts:
 ### reShapr control plane
 
 ```sh
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.3
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.4
 
-helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.3 \
+helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.4 \
   --create-namespace --namespace reshapr-system \ 
   --set postgresql.enabled=true \
   --set postgresql.auth.password=admin \       
@@ -40,9 +40,9 @@ helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/res
 ### reShapr proxy
 
 ```sh
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.2
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.4
 
-helm install reshapr-proxy oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.2 \
+helm install reshapr-proxy oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.4 \
   --create-namespace --namespace reshapr-proxies \
   --set gateway.idPrefix=acme \
   --set gateway.labels='env=dev;team=reshapr' \
