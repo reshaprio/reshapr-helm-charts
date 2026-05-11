@@ -190,6 +190,23 @@ admin:
   defaultGatewayTokensKey: "default-gateway-tokens"
 
 # =============================================================================
+# Authentication configuration
+# =============================================================================
+# -- Authentication configuration for reshapr-ctrl, including external OIDC ID provider settings
+authentication:
+  # -- Enable external OIDC ID provider authentication
+  idp:
+    enabled: false
+    # -- OIDC ID provider authentication screen URL (e.g., http://localhost:8888/realms/3rdparty/protocol/openid-connect/auth)
+    url: ""
+    # -- OIDC ID provider token URL (e.g., http://host.docker.internal:8888/realms/3rdparty/protocol/openid-connect/token)
+    tokenUrl: ""
+    # -- OIDC ID provider client ID
+    clientId: ""
+    # -- Optional: OIDC ID provider client secret if required
+    clientSecret: ""
+
+# =============================================================================
 # Communication between components
 # =============================================================================
 # -- API key for communication between authz and ctrl components

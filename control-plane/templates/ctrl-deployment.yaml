@@ -92,6 +92,20 @@ spec:
                 secretKeyRef:
                   name: {{ include "reshapr-ctrl-plane.encryptionKeySecretName" . }}
                   key: {{ .Values.encryptionKey.key }}
+            {{- if .Values.authentication.idp.enabled }}
+            - name: RESHAPR_AUTHENTICATION_IDP_ENABLED
+              value: "true"
+            - name: RESHAPR_AUTHENTICATION_IDP_URL
+              value: {{ .Values.authentication.idp.url }}
+            - name: RESHAPR_AUTHENTICATION_IDP_TOKEN_URL
+              value: {{ .Values.authentication.idp.tokenUrl }}
+            - name: RESHAPR_AUTHENTICATION_IDP_CLIENT_ID
+              value: {{ .Values.authentication.idp.clientId }}
+            {{- if .Values.authentication.idp.clientSecret }}
+            - name: RESHAPR_AUTHENTICATION_IDP_CLIENT_SECRET
+              value: {{ .Values.authentication.idp.clientSecret }}
+            {{- end }}
+            {{- end }}
             {{- if or .Values.jwtKeys.existingSecret .Values.jwtKeys.privateKey.value }}
             - name: SMALLRYE_JWT_SIGN_KEY_LOCATION
               value: /deployment/config/keys/{{ .Values.jwtKeys.privateKey.key }}

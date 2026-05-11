@@ -138,6 +138,16 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 | `admin.emailKey`                  | Key in the secret for Admin email           | `""`      |
 | `admin.defaultGatewayTokensKey`   | Key in the secret for defaultGatewayTokens  | `""`      |
 
+### Authentication Parameters
+
+| Parameter                            | Description                                               | Default |
+|--------------------------------------|-----------------------------------------------------------|---------|
+| `authentication.idp.enabled`         | Enable external OIDC ID provider authentication           | `false` |
+| `authentication.idp.url`             | OIDC ID provider authentication screen URL                | `""`    |
+| `authentication.idp.tokenUrl`        | OIDC ID provider token URL to exchange authorization code | `""`    |
+| `authentication.idp.clientId`        | OIDC ID provider client ID                                | `""`    |
+| `authentication.idp.clientSecret`    | OIDC ID provider client secret (optional)                 | `""`    |
+
 ### API Key Parameters
 
 | Parameter               | Description                   | Default   |
