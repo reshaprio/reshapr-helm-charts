@@ -2,8 +2,10 @@
 
 Helm Charts for installing reShapr components on Kubernetes
 
+[![Helm](https://img.shields.io/badge/dynamic/json?color=0F1689&logo=helm&style=for-the-badge&label=Helm&query=tags[1].name&url=https://quay.io/api/v1/repository/reshapr/reshapr-helm-charts/reshapr-control-plane/tag/?limit=10&page=1&onlyActiveTags=true)](https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-control-plane?tab=tags)
 [![License](https://img.shields.io/github/license/microcks/microcks-testcontainers-java?style=for-the-badge&logo=apache)](https://www.apache.org/licenses/LICENSE-2.0)
-
+[![Project Chat](https://img.shields.io/badge/discord-reshapr-pink.svg?color=7289da&style=for-the-badge&logo=discord)](https://discord.gg/KyDUdam34h)
+[![GitHub stars](https://img.shields.io/github/stars/reshaprio/reshapr-helm-charts?style=for-the-badge&logo=github&color=ffad05)](https://github.com/reshaprio/reshapr-helm-charts)
 
 ## Build Status
 
@@ -17,7 +19,7 @@ This repository contains two Helm charts:
 
 * The `reshapr-control-plane` Helm chart is dedicated to the installation of the reShapr control plane. It is distributed as an OCI artifact on https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-control-plane
 
-* The `reshapr-proxy` Helm chart is dedicated to the installation of the reShapr oproxy. It is distributed as an OCI artifact on https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-proxy
+* The `reshapr-proxy` Helm chart is dedicated to the installation of the reShapr proxy. It is distributed as an OCI artifact on https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-proxy
 
 ### reShapr control plane
 
