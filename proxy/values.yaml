@@ -142,9 +142,14 @@ gateway:
     tokenKey: "token"
 
 # -- Extra environment variables
-extraEnv: []
-# - name: CUSTOM_VAR
-#   value: "custom-value"
+extraEnv:
+  # -- OpenTelemetry SDK is enabled by default in the app, but it is disabled here to not 
+  #    pollute logs with connection errors in non-instrumented environments
+  - name: QUARKUS_OTEL_SDK_DISABLED
+    value: "true"
+  # -- OpenTelemetry Collector configuration running in the same namespace (e.g. Jaeger)
+  # - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
+  #   value: "http://jaeger:4317"
 
 # -- Extra volume mounts
 extraVolumeMounts: []
