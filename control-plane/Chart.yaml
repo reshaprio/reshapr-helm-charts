@@ -29,6 +29,6 @@ dependencies:
     condition: postgresql.enabled
     alias: postgresql
   - name: reshapr-web-ui
-    version: "0.1.0"
+    version: "*"
     repository: "file://../web-ui"
     condition: reshapr-web-ui.enabled

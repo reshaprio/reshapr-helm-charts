@@ -285,4 +285,4 @@ reshapr-web-ui:
     key: "api-key"
   # -- Control plane URL (supports Helm templates)
   controlPlane:
-    url: "http://{{ .Release.Name }}-ctrl:{{ .Values.ctrl.service.port }}"
+    url: "http://{{ .Release.Name }}-ctrl:5555"
