@@ -34,6 +34,7 @@ helm install reshapr-control-plane . \
 ```
 
 ### Production Installation (with external PostgreSQL)
+
 ```bash
 # Create secrets first
 kubectl create secret generic reshapr-db-credentials \

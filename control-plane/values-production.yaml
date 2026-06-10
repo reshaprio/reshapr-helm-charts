@@ -130,3 +130,13 @@ ingress:
 # Image pull secrets for private registry
 imagePullSecrets:
   - name: ghcr-pull-secret
+
+# =============================================================================
+# Web UI (optional, embedded as subchart)
+# =============================================================================
+reshapr-web-ui:
+  enabled: false
+  # When enabled, override apiKey.existingSecret to point to the
+  # externally managed secret used by the control-plane:
+  # apiKey:
+  #   existingSecret: "reshapr-api-key-secret"

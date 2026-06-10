@@ -47,7 +47,7 @@ spec:
             - name: HOST
               value: "0.0.0.0"
             - name: RESHAPR_CTRL_URL
-              value: {{ .Values.controlPlane.url | quote }}
+              value: {{ tpl .Values.controlPlane.url . | quote }}
             {{- if .Values.controlPlane.publicUrl }}
             - name: RESHAPR_CTRL_PUBLIC_URL
               value: {{ .Values.controlPlane.publicUrl | quote }}

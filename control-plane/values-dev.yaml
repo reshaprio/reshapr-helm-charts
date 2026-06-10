@@ -56,3 +56,9 @@ encryptionKey:
 # No ingress, use port-forward for local development
 ingress:
   enabled: false
+
+# =============================================================================
+# Web UI (optional, embedded as subchart)
+# =============================================================================
+reshapr-web-ui:
+  enabled: false

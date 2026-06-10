@@ -77,3 +77,30 @@ helm install reshapr-ui oci://quay.io/reshapr/reshapr-helm-charts/reshapr-ui --v
   --set 'ingress.tls[0].hosts[0]=reshapr-ui.acme.loc' \
   --set 'ingress.tls[0].secretName=reshapr-web-ui-tls'
 ```
+
+
+This `reshapr-web-ui` is also included as a dependency in the control plane chart. As a consequence, you can install it directly with the control plane in a single command:
+
+```bash
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.6
+
+helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.6 \
+  --create-namespace --namespace reshapr-system \
+  --set postgresql.enabled=true \
+  --set postgresql.auth.password=admin \
+  --set apiKey.value=dev-api-key-change-me-in-production \
+  --set encryptionKey.value=dev-encryption-key-change-me-in-production \
+  --set admin.nameValue=admin \
+  --set admin.passwordValue=password \
+  --set admin.emailValue=reshapr@example.com \
+  --set admin.defaultGatewayTokensValue=my-super-secret-token-xyz \
+  --set ingress.enabled=true \
+  --set ingress.ctrl.host=reshapr.acme.loc \
+  --set reshapr-web-ui.enabled=true \
+  --set reshapr-web-ui.publicUrl=https://reshapr-ui.acme.loc \
+  --set reshapr-web-ui.ingress.enabled=true \
+  --set reshapr-web-ui.ingress.annotations."cert\-manager\.io\/cluster\-issuer"=cert-cluster-issuer \
+  --set 'reshapr-web-ui.ingress.hosts[0].host=reshapr-ui.acme.loc' \
+  --set 'reshapr-web-ui.ingress.tls[0].hosts[0]=reshapr-ui.acme.loc' \
+  --set 'reshapr-web-ui.ingress.tls[0].secretName=reshapr-web-ui-tls'
+```

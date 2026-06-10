@@ -63,10 +63,12 @@ Create the name of the service account to use
 
 {{/*
 Get the API key secret name
+Supports templated values (e.g. "{{ .Release.Name }}-reshapr-control-plane-api-key")
+so the web-ui can reuse the control-plane's secret when embedded as a subchart.
 */}}
 {{- define "reshapr-web-ui.apiKeySecretName" -}}
 {{- if .Values.apiKey.existingSecret }}
-{{- .Values.apiKey.existingSecret }}
+{{- tpl .Values.apiKey.existingSecret . }}
 {{- else }}
 {{- printf "%s-api-key" (include "reshapr-web-ui.fullname" .) }}
 {{- end }}

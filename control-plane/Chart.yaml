@@ -28,3 +28,7 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: postgresql.enabled
     alias: postgresql
+  - name: reshapr-web-ui
+    version: "0.1.0"
+    repository: "file://../web-ui"
+    condition: reshapr-web-ui.enabled

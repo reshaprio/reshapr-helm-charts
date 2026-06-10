@@ -7,7 +7,7 @@ This Helm chart deploys the Reshapr Control Plane components on a Kubernetes clu
 This chart installs the following components:
 
 - **reshapr-ctrl**: The main control plane API server
-- **PostgreSQL** (optional): Database for both components
+- **PostgreSQL**: Database for the control plane
 
 ## Prerequisites
 

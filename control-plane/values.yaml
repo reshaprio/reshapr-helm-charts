@@ -257,6 +257,7 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
 
   # -- Ingress hosts configuration for ctrl
   ctrl:
@@ -271,3 +272,17 @@ ingress:
   #    hosts:
   #      - reshapr.example.com
   #      - idp.reshapr.example.com
+
+# =============================================================================
+# Web UI subchart configuration (optional)
+# =============================================================================
+reshapr-web-ui:
+  # -- Enable the embedded Web UI
+  enabled: false
+  # -- Override to reuse the control-plane API key secret (supports Helm templates)
+  apiKey:
+    existingSecret: "{{ .Release.Name }}-api-key"
+    key: "api-key"
+  # -- Control plane URL (supports Helm templates)
+  controlPlane:
+    url: "http://{{ .Release.Name }}-ctrl:{{ .Values.ctrl.service.port }}"
