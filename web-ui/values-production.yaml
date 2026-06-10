@@ -1,0 +1,87 @@
+# Example values for production deployment
+
+replicaCount: 2
+
+image:
+  repository: registry.reshapr.io/reshapr/reshapr-web-ui
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - reshapr-web-ui
+          topologyKey: kubernetes.io/hostname
+
+nodeSelector:
+  node-role.kubernetes.io/worker: "true"
+
+controlPlane:
+  url: "http://reshapr-control-plane-ctrl.reshapr-system.svc.cluster.local:5555"
+  publicUrl: "https://app.reshapr.example.com"
+
+apiKey:
+  value: ""
+  existingSecret: "reshapr-web-ui-api-key"
+  key: "api-key"
+
+publicUrl: "https://ui.reshapr.example.com"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: ui.reshapr.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: reshapr-web-ui-tls
+      hosts:
+        - ui.reshapr.example.com
+
+healthCheck:
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+imagePullSecrets:
+  - name: ghcr-pull-secret

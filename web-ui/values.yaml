@@ -1,0 +1,171 @@
+# Default values for reshapr-web-ui
+# This is a YAML-formatted file.
+
+# -- Global image pull secrets
+imagePullSecrets:
+  #- name: ghcr-secret
+
+# -- Override the name of the chart
+nameOverride: ""
+# -- Override the full name of the release
+fullnameOverride: ""
+
+# =============================================================================
+# Web UI configuration
+# =============================================================================
+
+# -- Number of replicas
+replicaCount: 1
+
+image:
+  # -- Image repository for reshapr-ui
+  repository: registry.reshapr.io/reshapr/reshapr-ui
+  # -- Image tag for reshapr-ui
+  tag: "nightly"
+  # -- Image pull policy
+  pullPolicy: Always
+
+# -- Service account configuration
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- Pod annotations
+podAnnotations: {}
+
+# -- Pod labels
+podLabels: {}
+
+# -- Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# -- Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Service configuration
+service:
+  type: ClusterIP
+  port: 3333
+  targetPort: 3333
+  annotations: {}
+
+# -- Resources limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+# -- Health check configuration
+healthCheck:
+  # -- Enable liveness probe
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  # -- Enable readiness probe
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+# -- Node selector
+nodeSelector: {}
+
+# -- Tolerations
+tolerations: []
+
+# -- Affinity configuration
+affinity: {}
+
+# -- Pod Disruption Budget configuration
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: 1
+
+# =============================================================================
+# Control Plane connection configuration
+# =============================================================================
+
+controlPlane:
+  # -- Control plane internal URL (used by the web-ui server-side)
+  url: "http://reshapr-control-plane-ctrl:5555"
+  # -- Control plane public URL (used by the web-ui client-side for OIDC login, if different from controlPlane.url)
+  publicUrl: ""
+
+# -- Admin API key for authenticating with the control plane
+apiKey:
+  # -- The API key value (should be overridden in production)
+  value: ""
+  # -- Use existing secret for API key
+  existingSecret: ""
+  # -- Key in the existing secret for API key
+  key: "api-key"
+
+# =============================================================================
+# Web UI public URL
+# =============================================================================
+
+# -- The public URL of the web-ui application (used for CORS, redirects, etc.)
+publicUrl: ""
+
+# -- Extra environment variables
+extraEnv: []
+
+# -- Extra volume mounts
+extraVolumeMounts: []
+
+# -- Extra volumes
+extraVolumes: []
+
+# =============================================================================
+# Ingress configuration
+# =============================================================================
+
+ingress:
+  # -- Enable ingress
+  enabled: false
+  # -- Ingress class name
+  className: ""
+  # -- Ingress annotations
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+
+  # -- Ingress hosts configuration
+  hosts:
+    - host: ui.reshapr.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+  # -- TLS configuration
+  tls: []

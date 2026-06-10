@@ -1,0 +1,24 @@
+apiVersion: v2
+name: reshapr-web-ui
+description: Reshapr - Web UI (Dashboard)
+
+type: application
+version: 0.1.0
+appVersion: 0.0.1
+keywords:
+  - mcp
+  - api
+  - web-ui
+  - dashboard
+  - reshapr
+
+home: https://reshapr.io
+sources:
+  - http://github.com/reshaprio/reshapr/
+  - https://reshapr.io
+maintainers:
+  - name: Laurent Broudoux
+    email: laurent.broudoux@gmail.com
+icon: https://reshapr.io/assets/images/image01.jpg?v=448586e6
+
+kubeVersion: '>=1.25.0-0'

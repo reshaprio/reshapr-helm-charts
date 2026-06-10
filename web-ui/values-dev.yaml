@@ -1,0 +1,34 @@
+# Example values for development deployment
+# This configuration is suitable for local development and testing
+
+replicaCount: 1
+
+image:
+  repository: registry.reshapr.io/reshapr/reshapr-web-ui
+  tag: "nightly"
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+controlPlane:
+  url: "http://reshapr-control-plane-ctrl:5555"
+  publicUrl: ""
+
+apiKey:
+  value: "dev-api-key-change-me-in-production"
+
+publicUrl: "http://localhost:3333"
+
+# No ingress for development (use port-forward)
+ingress:
+  enabled: false
+
+# No PDB for development
+podDisruptionBudget:
+  enabled: false
