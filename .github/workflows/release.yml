@@ -94,7 +94,7 @@ jobs:
       - name: Push web-ui chart
         id: push_web_ui
         run: |
-          OUTPUT=$(helm push ./packaged/reshapr-ui-${{ steps.get_version.outputs.version }}.tgz oci://quay.io/reshapr/reshapr-helm-charts 2>&1)
+          OUTPUT=$(helm push ./packaged/reshapr-web-ui-${{ steps.get_version.outputs.version }}.tgz oci://quay.io/reshapr/reshapr-helm-charts 2>&1)
           echo "$OUTPUT"
           DIGEST=$(echo "$OUTPUT" | grep -oP 'Digest: \K\S+')
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT 
@@ -102,7 +102,7 @@ jobs:
       - name: Sign web-ui chart
         run: |
           cosign sign --new-bundle-format=false --use-signing-config=false --yes \
-            quay.io/reshapr/reshapr-helm-charts/reshapr-ui@${{ steps.push_web_ui.outputs.digest }}
+            quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui@${{ steps.push_web_ui.outputs.digest }}
 
       - name: Create GitHub Release with JReleaser
         uses: jreleaser/release-action@90ac653bb9c79d11179e65d81499f3f34527dcd5 # v 2.5.0
