@@ -54,7 +54,7 @@ jobs:
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
-          helm dependency build ./control-plane
+          helm dependency update ./control-plane
           helm package ./control-plane --version ${{ steps.get_version.outputs.version }} --destination ./packaged
 
       - name: Package proxy chart
@@ -119,7 +119,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add control-plane/Chart.yaml proxy/Chart.yaml web-ui/Chart.yaml
+          git add control-plane/Chart.yaml control-plane/Chart.lock proxy/Chart.yaml web-ui/Chart.yaml
           git commit -m "chore: sync chart versions to ${VERSION}"
           git push origin main
 
