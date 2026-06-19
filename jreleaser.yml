@@ -23,5 +23,5 @@ files:
   artifacts:
     - path: 'packaged/reshapr-control-plane-{{projectVersion}}.tgz'
     - path: 'packaged/reshapr-proxy-{{projectVersion}}.tgz'
-    - path: 'packaged/reshapr-ui-{{projectVersion}}.tgz'
+    - path: 'packaged/reshapr-web-ui-{{projectVersion}}.tgz'
 
