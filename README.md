@@ -21,7 +21,7 @@ This repository contains two Helm charts:
 
 * The `reshapr-proxy` Helm chart is dedicated to the installation of the reShapr proxy. It is distributed as an OCI artifact on https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-proxy
 
-* The `reshapr-ui` Helm chart is dedicated to the installation of the reShapr control UI. It is distributed as an OCI artifact on https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-ui
+* The `reshapr-web-ui` Helm chart is dedicated to the installation of the reShapr control UI. It is distributed as an OCI artifact on https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-web-ui
 
 ### reShapr control plane
 
@@ -59,14 +59,14 @@ helm install reshapr-proxy oci://quay.io/reshapr/reshapr-helm-charts/reshapr-pro
   --set gateway.controlPlane.token=reshapr-my-super-secret-token-xyz
 ```
 
-### reShapr ui
+### reShapr UI
 
 For this one, a TLS ingress is mandatory if you choose to enable TLS. We're using a CertManager ClusterIssuer in example below:
 
 ```sh
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-ui --version 0.0.6
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui --version 0.0.6
 
-helm install reshapr-ui oci://quay.io/reshapr/reshapr-helm-charts/reshapr-ui --version 0.0.6 \
+helm install reshapr-ui oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui --version 0.0.6 \
   --namespace reshapr-system \
   --create-namespace \
   --set apiKey.value=dev-api-key-change-me-in-production \
