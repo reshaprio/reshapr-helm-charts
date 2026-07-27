@@ -1,0 +1,63 @@
+# Default values for controllers.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+operator:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: registry.reshapr.io/reshapr/reshapr-operator
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+admissionController:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: registry.reshapr.io/reshapr/reshapr-admission
+    pullPolicy: IfNotPresent
+    tag: ""
+  # The service for the admission webhook
+  service:
+    port: 8443
+    targetPort: 8443
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Empty podSecurityContext and securityContext to allow OpenShift restricted-v2 SCC to inject UIDs
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000

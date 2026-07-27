@@ -1,0 +1,19 @@
+{{- if .Values.admissionController.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "controllers.fullname" . }}-webhook-service
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.admissionController.service.port }}
+      targetPort: {{ .Values.admissionController.service.targetPort }}
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "controllers.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
+{{- end }}
