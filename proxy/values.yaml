@@ -106,9 +106,51 @@ affinity: {}
 
 # -- Pod Disruption Budget configuration
 podDisruptionBudget:
-  enabled: false
+  enabled: true
   minAvailable: 1
   # maxUnavailable: 1
+
+# =============================================================================
+# Infinispan clustering configuration (JGroups DNS_PING)
+# =============================================================================
+
+clustering:
+  # -- Enable Infinispan embedded clustering (replicated MCP state across replicas)
+  # When enabled, JGroups transport encryption (SYM_ENCRYPT) is always active.
+  enabled: true
+
+  # -- JGroups transport configuration
+  jgroups:
+    # -- JGroups TCP bind port (cluster communication)
+    port: 7778
+    # -- JGroups FD_SOCK2 failure-detection port (bind_port + 50000)
+    fdPort: 57778
+
+  # -- NetworkPolicy to restrict JGroups traffic to proxy pods only
+  networkPolicy:
+    enabled: false
+
+  # -- JGroups SYM_ENCRYPT keystore configuration.
+  # On initial install, a JCEKS keystore is auto-generated via a pre-install hook Job.
+  # On upgrade, the previously generated Secret is reused (never regenerated) so rolling
+  # updates can join the existing cluster without interruption.
+  # If you manage your own keystore, set 'existingSecret' to skip auto-generation.
+  encryption:
+    # -- Use an existing Secret instead of auto-generating the keystore.
+    # The Secret must contain keys matching keystoreFile, storePasswordKey and keyPasswordKey.
+    existingSecret: ""
+    # -- Key in the Secret for the keystore store password
+    storePasswordKey: "store-password"
+    # -- Key in the Secret for the keystore key password
+    keyPasswordKey: "key-password"
+    # -- Mount path for the keystore inside the container
+    keystoreMountPath: "/etc/reshapr/keystore"
+    # -- Keystore filename (key name inside the Secret)
+    keystoreFile: "reshapr-cluster.jceks"
+    # -- Key alias inside the JCEKS keystore
+    alias: "reshapr-cluster"
+    # -- Image used by the keystore generation Job (must have kubectl)
+    kubectlImage: "bitnami/kubectl:latest"
 
 # =============================================================================
 # Gateway specific configuration

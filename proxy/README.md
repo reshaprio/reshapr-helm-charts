@@ -121,6 +121,100 @@ The following table lists the configurable parameters of the Reshapr Gateway cha
 | `serviceMonitor.interval` | Scrape interval | `30s` |
 | `serviceMonitor.scrapeTimeout` | Scrape timeout | `10s` |
 
+### Clustering Parameters (Infinispan embedded)
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `clustering.enabled` | Enable replicated MCP state across pods (JGroups DNS_PING) | `true` |
+| `clustering.jgroups.port` | JGroups TCP bind port | `7778` |
+| `clustering.jgroups.fdPort` | JGroups FD_SOCK2 failure-detection port | `57778` |
+| `clustering.networkPolicy.enabled` | Create a NetworkPolicy for JGroups pod-to-pod traffic | `false` |
+| `clustering.encryption.existingSecret` | Use your own Secret (skip auto-generation) | `""` |
+| `clustering.encryption.storePasswordKey` | Key in the Secret for the keystore store password | `store-password` |
+| `clustering.encryption.keyPasswordKey` | Key in the Secret for the keystore key password | `key-password` |
+| `clustering.encryption.keystoreMountPath` | Mount path for the keystore | `/etc/reshapr/keystore` |
+| `clustering.encryption.keystoreFile` | Keystore filename (key name inside the Secret) | `reshapr-cluster.jceks` |
+| `clustering.encryption.alias` | Key alias inside the JCEKS keystore | `reshapr-cluster` |
+| `clustering.encryption.kubectlImage` | Image for the keystore generation Job | `bitnami/kubectl:latest` |
+
+## Infinispan Clustering
+
+When `clustering.enabled=true` (the default), the proxy pods form a replicated Infinispan cluster using JGroups DNS_PING over a headless Service. MCP session state (`session-store`, `elicitation-store`, `user-secret-store`) is replicated across all pods, ensuring resilience during rolling updates and pod failures.
+
+The JGroups transport is always encrypted with **SYM_ENCRYPT** (AES-256). A shared JCEKS keystore is required by all pods to form the cluster.
+
+### Default behavior (auto-generated keystore)
+
+On initial `helm install`, a **pre-install hook Job** automatically:
+1. Generates a JCEKS keystore containing an AES-256 secret key
+2. Stores it in a Kubernetes Secret (annotated with `helm.sh/resource-policy: keep`)
+
+On subsequent `helm upgrade`, the Job does **not** re-run. The previously generated Secret is reused, so new pods from a rolling update can join the existing cluster without interruption.
+
+### Bring Your Own Key (BYOK)
+
+If you want to manage the keystore yourself (e.g., for compliance, key rotation, or multi-cluster setups), you can provide your own Secret.
+
+**Step 1 — Generate the JCEKS keystore:**
+
+```bash
+keytool -genseckey \
+  -alias reshapr-cluster \
+  -keyalg AES -keysize 256 \
+  -storetype JCEKS \
+  -keystore reshapr-cluster.jceks \
+  -storepass <your-store-password> \
+  -keypass <your-key-password> \
+  -noprompt
+```
+
+**Step 2 — Create the Kubernetes Secret:**
+
+```bash
+kubectl create secret generic my-cluster-keystore \
+  --namespace reshapr-proxies \
+  --from-file=reshapr-cluster.jceks=reshapr-cluster.jceks \
+  --from-literal=store-password='<your-store-password>' \
+  --from-literal=key-password='<your-key-password>'
+```
+
+**Step 3 — Reference it in your values:**
+
+```yaml
+clustering:
+  encryption:
+    existingSecret: "my-cluster-keystore"
+```
+
+The Secret must contain the following keys (configurable via `storePasswordKey` / `keyPasswordKey` / `keystoreFile`):
+
+| Secret key | Content |
+|---|---|
+| `reshapr-cluster.jceks` | The JCEKS keystore binary file |
+| `store-password` | Keystore store password (plain text) |
+| `key-password` | Keystore key password (plain text) |
+
+If your Secret uses different key names:
+
+```yaml
+clustering:
+  encryption:
+    existingSecret: "my-cluster-keystore"
+    keystoreFile: "my-keystore.jceks"
+    storePasswordKey: "my-store-pwd"
+    keyPasswordKey: "my-key-pwd"
+    alias: "my-alias"
+```
+
+### Key rotation
+
+To rotate the encryption key:
+1. Generate a new keystore (Step 1 above)
+2. Update the Secret in-place: `kubectl create secret generic ... --dry-run=client -o yaml | kubectl apply -f -`
+3. Perform a rolling restart: `kubectl rollout restart deployment -n <namespace> <release>-reshapr-proxy`
+
+All pods must restart simultaneously with the new key — a gradual rollout would split the cluster. Consider setting `maxUnavailable: 100%` in the Deployment strategy for this operation.
+
 ## Gateway ID Generation
 
 The gateway ID is automatically generated using the pod name to ensure uniqueness:

@@ -1,0 +1,24 @@
+{{- if .Values.clustering.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "reshapr-proxy.fullname" . }}-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "reshapr-proxy.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - port: {{ .Values.clustering.jgroups.port }}
+      targetPort: jgroups
+      protocol: TCP
+      name: jgroups
+    - port: {{ .Values.clustering.jgroups.fdPort }}
+      targetPort: jgroups-fd
+      protocol: TCP
+      name: jgroups-fd
+  selector:
+    {{- include "reshapr-proxy.selectorLabels" . | nindent 4 }}
+{{- end }}

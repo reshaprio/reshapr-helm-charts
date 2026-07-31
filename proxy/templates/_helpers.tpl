@@ -82,3 +82,15 @@ Generate the gateway ID from pod name and optional prefix
 {{- printf "$(POD_NAME)" }}
 {{- end }}
 {{- end }}
+
+{{/*
+Get the cluster keystore Secret name.
+Uses existingSecret if provided, otherwise a generated name.
+*/}}
+{{- define "reshapr-proxy.keystoreSecretName" -}}
+{{- if .Values.clustering.encryption.existingSecret }}
+{{- .Values.clustering.encryption.existingSecret }}
+{{- else }}
+{{- printf "%s-cluster-keystore" (include "reshapr-proxy.fullname" .) }}
+{{- end }}
+{{- end }}

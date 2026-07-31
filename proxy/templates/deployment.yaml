@@ -40,12 +40,53 @@ spec:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
+            {{- if .Values.clustering.enabled }}
+            - name: jgroups
+              containerPort: {{ .Values.clustering.jgroups.port }}
+              protocol: TCP
+            - name: jgroups-fd
+              containerPort: {{ .Values.clustering.jgroups.fdPort }}
+              protocol: TCP
+            {{- end }}
           env:
             # Pod name for unique gateway ID
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- if .Values.clustering.enabled }}
+            # Pod IP for JGroups bind address (Downward API)
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            # JAVA_OPTS_APPEND: base JVM flags + Infinispan clustering properties.
+            # This REPLACES the Dockerfile default — keep base flags in sync with Dockerfile.jvm.
+            - name: JAVA_OPTS_APPEND
+              value: >-
+                -XX:+UseCompactObjectHeaders
+                -Dquarkus.http.host=0.0.0.0
+                -Djava.util.logging.manager=org.jboss.logmanager.LogManager
+                --enable-preview
+                -Dreshapr.infinispan.stack=reshapr-k8s
+                -Dreshapr.infinispan.dns-query={{ include "reshapr-proxy.fullname" . }}-headless.{{ .Release.Namespace }}.svc.cluster.local
+                -Djgroups.port_range=0
+                -Djgroups.bind.address=$(POD_IP)
+                -Dreshapr.infinispan.encrypt.keystore={{ .Values.clustering.encryption.keystoreMountPath }}/{{ .Values.clustering.encryption.keystoreFile }}
+                -Dreshapr.infinispan.encrypt.store-password=$(RESHAPR_CLUSTER_STORE_PASSWORD)
+                -Dreshapr.infinispan.encrypt.key-password=$(RESHAPR_CLUSTER_KEY_PASSWORD)
+                -Dreshapr.infinispan.encrypt.alias={{ .Values.clustering.encryption.alias }}
+            - name: RESHAPR_CLUSTER_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-proxy.keystoreSecretName" . }}
+                  key: {{ .Values.clustering.encryption.storePasswordKey }}
+            - name: RESHAPR_CLUSTER_KEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-proxy.keystoreSecretName" . }}
+                  key: {{ .Values.clustering.encryption.keyPasswordKey }}
+            {{- end }}
             # Gateway ID composed of prefix (if set) and pod name
             - name: RESHAPR_GATEWAY_ID
               value: {{ include "reshapr-proxy.gatewayId" . | quote }}
@@ -97,12 +138,25 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            {{- if .Values.clustering.enabled }}
+            - name: cluster-keystore
+              mountPath: {{ .Values.clustering.encryption.keystoreMountPath }}
+              readOnly: true
+            {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}
+        {{- if .Values.clustering.enabled }}
+        - name: cluster-keystore
+          secret:
+            secretName: {{ include "reshapr-proxy.keystoreSecretName" . }}
+            items:
+              - key: {{ .Values.clustering.encryption.keystoreFile }}
+                path: {{ .Values.clustering.encryption.keystoreFile }}
+        {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -110,9 +164,20 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- if or .Values.affinity .Values.clustering.enabled }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- if .Values.affinity }}
+        {{- toYaml .Values.affinity | nindent 8 }}
+        {{- else if .Values.clustering.enabled }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "reshapr-proxy.selectorLabels" . | nindent 20 }}
+                topologyKey: kubernetes.io/hostname
+        {{- end }}
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
