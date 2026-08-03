@@ -1,5 +1,5 @@
 apiVersion: v2
-name: controllers
+name: reshapr-controllers
 description: A Helm chart for Reshapr Controllers (Operator & Admission Controller)
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -21,4 +21,19 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.0.0"
+appVersion: 0.0.1
+keywords:
+  - operators
+  - controllers
+  - reshapr
+
+home: https://reshapr.io
+sources:
+  - http://github.com/reshaprio/reshapr-controllers/
+  - https://reshapr.io
+maintainers:
+  - name: Laurent Broudoux
+    email: laurent.broudoux@gmail.com
+icon: https://reshapr.io/assets/images/image01.jpg?v=448586e6
+
+kubeVersion: '>=1.25.0-0'

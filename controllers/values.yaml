@@ -7,9 +7,8 @@ operator:
   replicaCount: 1
   image:
     repository: registry.reshapr.io/reshapr/reshapr-operator
+    tag: "nightly"
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
   resources: {}
     # limits:
     #   cpu: 100m
@@ -26,8 +25,8 @@ admissionController:
   replicaCount: 1
   image:
     repository: registry.reshapr.io/reshapr/reshapr-admission
+    tag: "nightly"
     pullPolicy: IfNotPresent
-    tag: ""
   # The service for the admission webhook
   service:
     port: 8443
