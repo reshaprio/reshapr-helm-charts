@@ -1,0 +1,30 @@
+{{- if .Values.admissionController.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "controllers.fullname" . }}-admission
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["reshapr.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "controllers.fullname" . }}-admission
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "controllers.fullname" . }}-admission
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "controllers.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

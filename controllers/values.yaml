@@ -1,0 +1,84 @@
+# Default values for controllers.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+operator:
+  # -- Enable the operator component
+  enabled: true
+  # -- Number of replicas for the operator deployment
+  replicaCount: 1
+  image:
+    # -- Image repository for the operator
+    repository: registry.reshapr.io/reshapr/reshapr-operator
+    # -- Image tag for the operator
+    tag: "nightly"
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Resource requests and limits for the operator pod
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  # -- Node labels for pod assignment
+  nodeSelector: {}
+  # -- Tolerations for pod assignment
+  tolerations: []
+  # -- Affinity rules for pod assignment
+  affinity: {}
+
+admissionController:
+  # -- Enable the admission webhook component
+  enabled: true
+  # -- Number of replicas for the admission webhook deployment
+  replicaCount: 1
+  image:
+    # -- Image repository for the admission webhook
+    repository: registry.reshapr.io/reshapr/reshapr-admission
+    # -- Image tag for the admission webhook
+    tag: "nightly"
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+  service:
+    # -- The port the admission webhook service listens on
+    port: 8443
+    # -- The target port of the admission webhook container
+    targetPort: 8443
+  # -- Resource requests and limits for the admission webhook pod
+  resources: {}
+  # -- Node labels for pod assignment
+  nodeSelector: {}
+  # -- Tolerations for pod assignment
+  tolerations: []
+  # -- Affinity rules for pod assignment
+  affinity: {}
+
+# -- Image pull secrets to access private registries
+imagePullSecrets: []
+# -- Override the name of the chart
+nameOverride: ""
+# -- Override the fully qualified app name
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- Empty podSecurityContext to allow OpenShift restricted-v2 SCC to inject UIDs
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Empty securityContext to allow OpenShift restricted-v2 SCC to inject capabilities
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
