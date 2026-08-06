@@ -19,6 +19,6 @@ sources:
 maintainers:
   - name: Laurent Broudoux
     email: laurent.broudoux@gmail.com
-icon: https://reshapr.io/assets/images/image01.jpg?v=448586e6
+icon: https://reshapr.io/img/reShapr-mark.png
 
 kubeVersion: '>=1.25.0-0'
