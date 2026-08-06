@@ -9,9 +9,9 @@ Helm Charts for installing reShapr components on Kubernetes
 
 ## Build Status
 
-Latest released version is `0.0.6`.
+Latest released version is `0.0.7`.
 
-Current development version is `0.0.7`.
+Current development version is `0.0.8`.
 
 ## How to use them?
 
@@ -26,9 +26,9 @@ This repository contains two Helm charts:
 ### reShapr control plane
 
 ```sh
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.6
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.7
 
-helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.6 \
+helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.7 \
   --create-namespace --namespace reshapr-system \
   --set postgresql.enabled=true \
   --set postgresql.auth.password=admin \
@@ -45,9 +45,9 @@ helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/res
 ### reShapr proxy
 
 ```sh
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.6
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.7
 
-helm install reshapr-proxy oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.6 \
+helm install reshapr-proxy oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy --version 0.0.7 \
   --create-namespace --namespace reshapr-proxies \
   --set gateway.idPrefix=acme \
   --set gateway.labels='env=dev;team=reshapr' \
@@ -64,9 +64,9 @@ helm install reshapr-proxy oci://quay.io/reshapr/reshapr-helm-charts/reshapr-pro
 For this one, a TLS ingress is mandatory if you choose to enable TLS. We're using a CertManager ClusterIssuer in example below:
 
 ```sh
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui --version 0.0.6
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui --version 0.0.7
 
-helm install reshapr-ui oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui --version 0.0.6 \
+helm install reshapr-ui oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui --version 0.0.7 \
   --namespace reshapr-system \
   --create-namespace \
   --set apiKey.value=dev-api-key-change-me-in-production \
@@ -82,9 +82,9 @@ helm install reshapr-ui oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui
 This `reshapr-web-ui` is also included as a dependency in the control plane chart. As a consequence, you can install it directly with the control plane in a single command:
 
 ```bash
-helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.6
+helm pull oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.7
 
-helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.6 \
+helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane --version 0.0.7 \
   --create-namespace --namespace reshapr-system \
   --set postgresql.enabled=true \
   --set postgresql.auth.password=admin \
