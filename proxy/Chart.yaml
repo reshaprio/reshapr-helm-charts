@@ -3,7 +3,7 @@ name: reshapr-proxy
 description: Reshapr - Gateway (Data Plane)
 
 type: application
-version: 0.1.0
+version: 0.0.7
 appVersion: 0.0.1
 keywords:
   - mcp

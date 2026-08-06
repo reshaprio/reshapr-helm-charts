@@ -3,7 +3,7 @@ name: reshapr-control-plane
 description: Reshapr - Control Plane (reshapr-ctrl and optional postgresql components)
 
 type: application
-version: 0.1.0
+version: 0.0.7
 appVersion: 0.0.1
 keywords:
   - mcp
