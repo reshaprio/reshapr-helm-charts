@@ -100,10 +100,16 @@ spec:
             - name: RESHAPR_AUTHENTICATION_IDP_TOKEN_URL
               value: {{ .Values.authentication.idp.tokenUrl }}
             - name: RESHAPR_AUTHENTICATION_IDP_CLIENT_ID
-              value: {{ .Values.authentication.idp.clientId }}
-            {{- if .Values.authentication.idp.clientSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-ctrl-plane.idpSecretName" . }}
+                  key: {{ .Values.authentication.idp.clientIdKey }}
+            {{- if or .Values.authentication.idp.clientSecret .Values.authentication.idp.existingSecret }}
             - name: RESHAPR_AUTHENTICATION_IDP_CLIENT_SECRET
-              value: {{ .Values.authentication.idp.clientSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-ctrl-plane.idpSecretName" . }}
+                  key: {{ .Values.authentication.idp.clientSecretKey }}
             {{- end }}
             {{- end }}
             {{- if or .Values.jwtKeys.existingSecret .Values.jwtKeys.privateKey.value }}

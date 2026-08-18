@@ -234,3 +234,20 @@ Get the JWT keys secret name
 {{- end }}
 {{- end }}
 
+{{/*
+=============================================================================
+Authentication IDP helpers
+=============================================================================
+*/}}
+
+{{/*
+Get the IDP credentials secret name
+*/}}
+{{- define "reshapr-ctrl-plane.idpSecretName" -}}
+{{- if .Values.authentication.idp.existingSecret }}
+{{- .Values.authentication.idp.existingSecret }}
+{{- else }}
+{{- printf "%s-idp-credentials" (include "reshapr-ctrl-plane.fullname" .) }}
+{{- end }}
+{{- end }}
+

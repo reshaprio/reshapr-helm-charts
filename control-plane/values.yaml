@@ -201,10 +201,16 @@ authentication:
     url: ""
     # -- OIDC ID provider token URL (e.g., http://host.docker.internal:8888/realms/3rdparty/protocol/openid-connect/token)
     tokenUrl: ""
-    # -- OIDC ID provider client ID
+    # -- OIDC ID provider client ID (used when existingSecret is not set)
     clientId: ""
-    # -- Optional: OIDC ID provider client secret if required
+    # -- Optional: OIDC ID provider client secret if required (used when existingSecret is not set)
     clientSecret: ""
+    # -- Use existing secret for IDP client credentials
+    existingSecret: ""
+    # -- Key in the existing secret for client ID
+    clientIdKey: "client-id"
+    # -- Key in the existing secret for client secret
+    clientSecretKey: "client-secret"
 
 # =============================================================================
 # Communication between components

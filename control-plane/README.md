@@ -139,13 +139,16 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 
 ### Authentication Parameters
 
-| Parameter                            | Description                                               | Default |
-|--------------------------------------|-----------------------------------------------------------|---------|
-| `authentication.idp.enabled`         | Enable external OIDC ID provider authentication           | `false` |
-| `authentication.idp.url`             | OIDC ID provider authentication screen URL                | `""`    |
-| `authentication.idp.tokenUrl`        | OIDC ID provider token URL to exchange authorization code | `""`    |
-| `authentication.idp.clientId`        | OIDC ID provider client ID                                | `""`    |
-| `authentication.idp.clientSecret`    | OIDC ID provider client secret (optional)                 | `""`    |
+| Parameter                                | Description                                               | Default         |
+|------------------------------------------|-----------------------------------------------------------|-----------------|
+| `authentication.idp.enabled`             | Enable external OIDC ID provider authentication           | `false`         |
+| `authentication.idp.url`                 | OIDC ID provider authentication screen URL                | `""`            |
+| `authentication.idp.tokenUrl`            | OIDC ID provider token URL to exchange authorization code | `""`            |
+| `authentication.idp.clientId`            | OIDC ID provider client ID (used when existingSecret is not set) | `""`     |
+| `authentication.idp.clientSecret`        | OIDC ID provider client secret (used when existingSecret is not set, optional) | `""` |
+| `authentication.idp.existingSecret`      | Existing secret for IDP client credentials                | `""`            |
+| `authentication.idp.clientIdKey`         | Key in the existing secret for client ID                  | `"client-id"`   |
+| `authentication.idp.clientSecretKey`     | Key in the existing secret for client secret              | `"client-secret"` |
 
 ### API Key Parameters
 
