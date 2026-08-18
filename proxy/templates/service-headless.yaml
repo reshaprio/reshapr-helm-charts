@@ -14,11 +14,11 @@ spec:
     - port: {{ .Values.clustering.jgroups.port }}
       targetPort: jgroups
       protocol: TCP
-      name: jgroups
+      name: tcp-jgroups
     - port: {{ .Values.clustering.jgroups.fdPort }}
       targetPort: jgroups-fd
       protocol: TCP
-      name: jgroups-fd
+      name: tcp-jgroups-fd
   selector:
     {{- include "reshapr-proxy.selectorLabels" . | nindent 4 }}
 {{- end }}
