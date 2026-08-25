@@ -111,6 +111,26 @@ spec:
                   name: {{ include "reshapr-ctrl-plane.idpSecretName" . }}
                   key: {{ .Values.authentication.idp.clientSecretKey }}
             {{- end }}
+            {{- if .Values.authentication.idp.guardAccess.group }}
+            - name: RESHAPR_AUTHENTICATION_IDP_GUARD_ACCESS_GROUP
+              value: {{ .Values.authentication.idp.guardAccess.group }}
+            {{- end }}
+            {{- if .Values.authentication.idp.guardAccess.claim }}
+            - name: RESHAPR_AUTHENTICATION_IDP_GUARD_ACCESS_CLAIM
+              value: {{ .Values.authentication.idp.guardAccess.claim }}
+            {{- end }}
+            {{- if .Values.authentication.idp.defaultOrganization.claim }}
+            - name: RESHAPR_AUTHENTICATION_IDP_DEFAULT_ORGANIZATION_CLAIM
+              value: {{ .Values.authentication.idp.defaultOrganization.claim }}
+            {{- end }}
+            {{- if .Values.authentication.idp.defaultOrganization.groupPrefix }}
+            - name: RESHAPR_AUTHENTICATION_IDP_DEFAULT_ORGANIZATION_GROUP_PREFIX
+              value: {{ .Values.authentication.idp.defaultOrganization.groupPrefix }}
+            {{- end }}
+            {{- if .Values.authentication.idp.defaultOrganization.value }}
+            - name: RESHAPR_AUTHENTICATION_IDP_DEFAULT_ORGANIZATION_VALUE
+              value: {{ .Values.authentication.idp.defaultOrganization.value }}
+            {{- end }}
             {{- end }}
             {{- if or .Values.jwtKeys.existingSecret .Values.jwtKeys.privateKey.value }}
             - name: SMALLRYE_JWT_SIGN_KEY_LOCATION

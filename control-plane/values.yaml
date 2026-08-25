@@ -212,6 +212,23 @@ authentication:
     # -- Key in the existing secret for client secret
     clientSecretKey: "client-secret"
 
+    # -- Optional IDP access guard: only allow users whose JWT satisfies these constraints.
+    guardAccess:
+      # -- Restrict access to a specific IDP group (standard JWT `groups` claim)
+      group: ""
+      # -- Restrict access based on a claim `name=value` expression
+      claim: ""
+
+    # -- Optional default organization: skip onboarding and attach the user to an existing organization.
+    defaultOrganization:
+      # -- Resolve default organization from a specific claim in the JWT
+      claim: ""
+      # -- Resolve default organization from a specific group prefix in the JWT (ex: 'reshapr-org')
+      groupPrefix: ""
+      # -- Use a specific default organization value
+      value: ""
+
+
 # =============================================================================
 # Communication between components
 # =============================================================================
