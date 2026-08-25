@@ -82,6 +82,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "reshapr-ctrl-plane.adminSecretName" . }}
                   key: {{ .Values.admin.defaultGatewayTokensKey }}
+            - name: RESHAPR_DEFAULT_GATEWAY_LABELS
+              value: {{ .Values.admin.defaultGatewayLabels | quote }}
             - name: RESHAPR_CTRL_API_KEY
               valueFrom:
                 secretKeyRef:

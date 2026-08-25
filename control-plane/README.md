@@ -136,6 +136,8 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 | `admin.passwordKey`               | Key in the secret for Admin password        | `""`      |
 | `admin.emailKey`                  | Key in the secret for Admin email           | `""`      |
 | `admin.defaultGatewayTokensKey`   | Key in the secret for defaultGatewayTokens  | `""`      |
+| `admin.defaultGatewayLabels`      | Default gateway group labels (semi-colon separated `key=value` pairs) | `""`      |
+| `admin.defaultGatewayLabels`.     | Default gateway group labels (semi-colon separated key=value pairs)  | `""`      |
 
 ### Authentication Parameters
 

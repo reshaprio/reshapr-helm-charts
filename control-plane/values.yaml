@@ -188,6 +188,8 @@ admin:
   emailKey: "email"
   # -- Key in the existing secret for Default Gateway Tokens (comma-separated list)
   defaultGatewayTokensKey: "default-gateway-tokens"
+  # -- Default gateway group labels (semi-colon separated key=value pairs)
+  defaultGatewayLabels: ""
 
 # =============================================================================
 # Authentication configuration
