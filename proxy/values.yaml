@@ -110,6 +110,13 @@ podDisruptionBudget:
   minAvailable: 1
   # maxUnavailable: 1
 
+# -- Job security context for keystore generation
+jobSecurityContext:
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  # runAsGroup: 1000
+  # fsGroup: 1000
+
 # =============================================================================
 # Infinispan clustering configuration (JGroups DNS_PING)
 # =============================================================================
