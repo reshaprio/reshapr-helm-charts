@@ -60,6 +60,18 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            # Keystore passwords MUST be defined before JAVA_OPTS_APPEND so Kubernetes
+            # can expand the $(VAR) references below (forward refs are left unexpanded).
+            - name: RESHAPR_CLUSTER_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-proxy.keystoreSecretName" . }}
+                  key: {{ .Values.clustering.encryption.storePasswordKey }}
+            - name: RESHAPR_CLUSTER_KEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-proxy.keystoreSecretName" . }}
+                  key: {{ .Values.clustering.encryption.keyPasswordKey }}
             # JAVA_OPTS_APPEND: base JVM flags + Infinispan clustering properties.
             # This REPLACES the Dockerfile default — keep base flags in sync with Dockerfile.jvm.
             - name: JAVA_OPTS_APPEND
@@ -76,16 +88,6 @@ spec:
                 -Dreshapr.infinispan.encrypt.store-password=$(RESHAPR_CLUSTER_STORE_PASSWORD)
                 -Dreshapr.infinispan.encrypt.key-password=$(RESHAPR_CLUSTER_KEY_PASSWORD)
                 -Dreshapr.infinispan.encrypt.alias={{ .Values.clustering.encryption.alias }}
-            - name: RESHAPR_CLUSTER_STORE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "reshapr-proxy.keystoreSecretName" . }}
-                  key: {{ .Values.clustering.encryption.storePasswordKey }}
-            - name: RESHAPR_CLUSTER_KEY_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "reshapr-proxy.keystoreSecretName" . }}
-                  key: {{ .Values.clustering.encryption.keyPasswordKey }}
             {{- end }}
             # Gateway ID composed of prefix (if set) and pod name
             - name: RESHAPR_GATEWAY_ID
