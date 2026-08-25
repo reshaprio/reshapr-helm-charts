@@ -149,6 +149,7 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 | `authentication.idp.existingSecret`      | Existing secret for IDP client credentials                | `""`            |
 | `authentication.idp.clientIdKey`         | Key in the existing secret for client ID                  | `"client-id"`   |
 | `authentication.idp.clientSecretKey`     | Key in the existing secret for client secret              | `"client-secret"` |
+| `authentication.idp.scopes`              | Additional OIDC scopes to request (comma-separated list, e.g. `my-scope-1,my-scope-2`) | `""` |
 | `authentication.idp.guardAccess.group`   | Restrict access to a specific IDP group (standard JWT `groups` claim) | `""`   |
 | `authentication.idp.guardAccess.claim`   | Restrict access based on a claim `name=value` expression  | `""`            |
 | `authentication.idp.defaultOrganization.claim`       | Resolve default organization from a specific JWT claim | `""`      |

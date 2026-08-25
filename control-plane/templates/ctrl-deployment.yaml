@@ -111,6 +111,10 @@ spec:
                   name: {{ include "reshapr-ctrl-plane.idpSecretName" . }}
                   key: {{ .Values.authentication.idp.clientSecretKey }}
             {{- end }}
+            {{- if .Values.authentication.idp.scopes }}
+            - name: RESHAPR_AUTHENTICATION_IDP_SCOPES
+              value: {{ .Values.authentication.idp.scopes }}
+            {{- end }}
             {{- if .Values.authentication.idp.guardAccess.group }}
             - name: RESHAPR_AUTHENTICATION_IDP_GUARD_ACCESS_GROUP
               value: {{ .Values.authentication.idp.guardAccess.group }}

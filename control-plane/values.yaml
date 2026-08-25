@@ -212,6 +212,9 @@ authentication:
     # -- Key in the existing secret for client secret
     clientSecretKey: "client-secret"
 
+    # -- Additionnal OIDC scopes to request (comma-separated list) Exemple: "my-scope-1,my-scope-2"
+    scopes: ""
+
     # -- Optional IDP access guard: only allow users whose JWT satisfies these constraints.
     guardAccess:
       # -- Restrict access to a specific IDP group (standard JWT `groups` claim)
