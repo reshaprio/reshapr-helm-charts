@@ -166,6 +166,24 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 | `apiKey.existingSecret` | Existing secret for API key   | `""`      |
 | `apiKey.key`            | Key in the secret for API key | `api-key` |
 
+### Encryption Key Parameters
+
+| Parameter                      | Description                                                                       | Default            |
+|--------------------------------|----------------------------------------------------------------------------------|--------------------|
+| `encryptionKey.value`          | Encryption key for sensitive data (should be overridden in production) - must be 16, 24 or 32 characters long | `""`               |
+| `encryptionKey.existingSecret` | Existing secret for encryption key                                               | `""`               |
+| `encryptionKey.key`            | Key in the existing secret for encryption key                                    | `encryption-key`   |
+
+### JWT Keys Parameters
+
+| Parameter                     | Description                                                                | Default            |
+|-------------------------------|----------------------------------------------------------------------------|--------------------|
+| `jwtKeys.existingSecret`      | Existing secret for both private and public keys                           | `""`               |
+| `jwtKeys.privateKey.value`    | Private key value for signing JWT tokens (should be overridden in production) | `""`            |
+| `jwtKeys.privateKey.key`      | Key in the existing secret for private key                                 | `private-key.pem`  |
+| `jwtKeys.publicKey.value`     | Public key value for verifying JWT tokens (should be overridden in production) | `""`           |
+| `jwtKeys.publicKey.key`       | Key in the existing secret for public key                                  | `public-key.pem`   |
+
 ### Ingress Parameters
 
 | Parameter            | Description        | Default  |

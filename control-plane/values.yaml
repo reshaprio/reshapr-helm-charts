@@ -251,7 +251,7 @@ apiKey:
 # =============================================================================
 # -- Encryption key for sensitive data (e.g., tokens) in ctrl + database component
 encryptionKey:
-  # -- The encryption key value (should be overridden in production)
+  # -- The encryption key value (should be overridden in production) - must be 16, 24 or 32 characters long.
   value: ""
   # -- Use existing secret for encryption key
   existingSecret: ""
