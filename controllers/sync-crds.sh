@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "Fetching latest CRDs from reshapr-controllers repository..."
+# Sync the CRDs shipped by the chart with the ones from the upstream reshapr-controllers repository.
+# Run from the chart directory: ./sync-crds.sh
 
-CRD_URL_BASE="https://raw.githubusercontent.com/reshaprio/reshapr-controllers/main/deploy/crd"
+REF="${REF:-main}"
+CRD_URL_BASE="https://raw.githubusercontent.com/reshaprio/reshapr-controllers/${REF}/deploy/crd"
 
-curl -sSL "$CRD_URL_BASE/services.reshapr.io-v1.yml" -o crds/services.reshapr.io-v1.yml
+CRDS=(
+  configurationplans.reshapr.io-v1.yml
+  customtools.reshapr.io-v1.yml
+  expositions.reshapr.io-v1.yml
+  gatewaygroups.reshapr.io-v1.yml
+  resources.reshapr.io-v1.yml
+  secretsources.reshapr.io-v1.yml
+  services.reshapr.io-v1.yml
+)
 
-echo "Done."
+echo "Fetching CRDs from reshapr-controllers@${REF} ..."
+for crd in "${CRDS[@]}"; do
+  echo "  - ${crd}"
+  curl -fsSL "${CRD_URL_BASE}/${crd}" -o "crds/${crd}"
+done
+
+echo "Done. ${#CRDS[@]} CRDs synced into ./crds/"

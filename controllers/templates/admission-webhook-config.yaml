@@ -1,51 +1,114 @@
 {{- if .Values.admissionController.enabled }}
+{{- $cert := .Values.admissionController.certificate }}
+{{- $provider := $cert.provider }}
+{{- $fullname := include "controllers.fullname" . }}
+{{- $svc := include "controllers.admission.serviceName" . }}
+{{- $ns := .Release.Namespace }}
+{{- if not (has $provider (list "cert-manager" "openshift" "existing")) }}
+{{- fail (printf "admissionController.certificate.provider must be one of cert-manager, openshift, existing (got %q)" $provider) }}
+{{- end }}
 apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration
+kind: MutatingWebhookConfiguration
 metadata:
-  name: {{ include "controllers.fullname" . }}-validating-webhook-configuration
+  name: {{ $fullname }}-mutating-webhook
   labels:
     {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
+  {{- if eq $provider "cert-manager" }}
   annotations:
-    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "controllers.fullname" . }}-serving-cert
+    cert-manager.io/inject-ca-from: {{ $ns }}/{{ $fullname }}-admission-serving-cert
+  {{- else if eq $provider "openshift" }}
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+  {{- end }}
 webhooks:
-  - name: vadmission.reshapr.io
+  - name: mutating.reshapr.io
+    rules:
+      - apiGroups:   [""]
+        apiVersions: ["v1"]
+        operations:  ["CREATE"]
+        resources:   ["pods"]
+        scope:       "Namespaced"
+    # Never intercept pods in system namespaces — this prevents a self-deadlock where the
+    # webhook cannot be (re)deployed because the API server calls it while it is down.
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - {{ $ns }}
+            {{- range .Values.admissionController.webhook.excludedNamespaces }}
+            - {{ . }}
+            {{- end }}
     clientConfig:
       service:
-        name: {{ include "controllers.fullname" . }}-webhook-service
-        namespace: {{ .Release.Namespace }}
-        path: /validate
-    rules:
-      - operations: ["CREATE", "UPDATE"]
-        apiGroups: ["reshapr.io"]
-        apiVersions: ["v1alpha1"]
-        resources: ["*"]
-    admissionReviewVersions: ["v1", "v1beta1"]
+        namespace: {{ $ns }}
+        name: {{ $svc }}
+        path: {{ .Values.admissionController.webhook.path | quote }}
+        port: {{ .Values.admissionController.service.httpsPort }}
+      {{- if and (eq $provider "existing") $cert.caBundle }}
+      caBundle: {{ $cert.caBundle }}
+      {{- end }}
+    admissionReviewVersions: ["v1"]
     sideEffects: None
-    timeoutSeconds: 10
+    # Fail open by default: if the webhook is unreachable, admit pods un-injected instead of blocking the cluster.
+    failurePolicy: {{ .Values.admissionController.webhook.failurePolicy }}
+    timeoutSeconds: {{ .Values.admissionController.webhook.timeoutSeconds }}
+{{- if eq $provider "cert-manager" }}
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
+apiVersion: v1
+kind: Secret
 metadata:
-  name: {{ include "controllers.fullname" . }}-serving-cert
-  namespace: {{ .Release.Namespace }}
+  name: {{ $fullname }}-admission-tls-pass
   labels:
     {{- include "controllers.labels" . | nindent 4 }}
-spec:
-  dnsNames:
-  - {{ include "controllers.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc
-  - {{ include "controllers.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc.cluster.local
-  issuerRef:
-    kind: Issuer
-    name: {{ include "controllers.fullname" . }}-selfsigned-issuer
-  secretName: {{ include "controllers.fullname" . }}-webhook-cert
+    app.kubernetes.io/component: admission
+type: Opaque
+data:
+  password: {{ include "controllers.admission.keystorePassword" . | b64enc | quote }}
+{{- if not $cert.certManager.issuerRef }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: {{ include "controllers.fullname" . }}-selfsigned-issuer
-  namespace: {{ .Release.Namespace }}
+  name: {{ $fullname }}-admission-selfsigned-issuer
   labels:
     {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
 spec:
   selfSigned: {}
+{{- end }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $fullname }}-admission-serving-cert
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
+spec:
+  secretName: {{ $fullname }}-admission-tls
+  duration: {{ .Values.admissionController.certificate.certManager.duration }}
+  renewBefore: {{ .Values.admissionController.certificate.certManager.renewBefore }}
+  dnsNames:
+    - {{ $svc }}.{{ $ns }}.svc
+    - {{ $svc }}.{{ $ns }}.svc.cluster.local
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 2048
+  keystores:
+    pkcs12:
+      create: true
+      passwordSecretRef:
+        name: {{ $fullname }}-admission-tls-pass
+        key: password
+  issuerRef:
+    {{- if $cert.certManager.issuerRef }}
+    {{- toYaml $cert.certManager.issuerRef | nindent 4 }}
+    {{- else }}
+    kind: Issuer
+    name: {{ $fullname }}-admission-selfsigned-issuer
+    {{- end }}
+{{- end }}
 {{- end }}

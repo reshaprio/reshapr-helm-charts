@@ -1,17 +1,34 @@
 {{- if .Values.admissionController.enabled }}
+{{- if .Values.admissionController.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "controllers.admission.serviceAccountName" . }}
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
+  {{- with .Values.admissionController.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+{{- end }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ include "controllers.fullname" . }}-admission
   labels:
     {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
 rules:
+  # Watch Deployments carrying the io.reshapr/inject annotation.
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+  # Manage the per-Deployment headless Service used for JGroups DNS_PING discovery.
   - apiGroups: [""]
-    resources: ["pods", "services", "configmaps", "secrets"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["reshapr.io"]
-    resources: ["*"]
-    verbs: ["get", "list", "watch"]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -19,12 +36,13 @@ metadata:
   name: {{ include "controllers.fullname" . }}-admission
   labels:
     {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: {{ include "controllers.fullname" . }}-admission
 subjects:
   - kind: ServiceAccount
-    name: {{ include "controllers.serviceAccountName" . }}
+    name: {{ include "controllers.admission.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 {{- end }}

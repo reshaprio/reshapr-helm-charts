@@ -46,7 +46,7 @@ jobs:
       - name: Sync chart versions from tag
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
-          for chart in control-plane proxy web-ui; do
+          for chart in control-plane proxy web-ui controllers; do
             sed -i "s/^version:.*/version: ${VERSION}/" ./${chart}/Chart.yaml
           done
 
@@ -64,6 +64,10 @@ jobs:
       - name: Package web-ui chart
         run: |
           helm package ./web-ui --version ${{ steps.get_version.outputs.version }} --destination ./packaged
+
+      - name: Package controllers chart
+        run: |
+          helm package ./controllers --version ${{ steps.get_version.outputs.version }} --destination ./packaged
 
       - name: Push control-plane chart
         id: push_control_plane
@@ -104,6 +108,19 @@ jobs:
           cosign sign --new-bundle-format=false --use-signing-config=false --yes \
             quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui@${{ steps.push_web_ui.outputs.digest }}
 
+      - name: Push controllers chart
+        id: push_controllers
+        run: |
+          OUTPUT=$(helm push ./packaged/reshapr-controllers-${{ steps.get_version.outputs.version }}.tgz oci://quay.io/reshapr/reshapr-helm-charts 2>&1)
+          echo "$OUTPUT"
+          DIGEST=$(echo "$OUTPUT" | grep -oP 'Digest: \K\S+')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+
+      - name: Sign controllers chart
+        run: |
+          cosign sign --new-bundle-format=false --use-signing-config=false --yes \
+            quay.io/reshapr/reshapr-helm-charts/reshapr-controllers@${{ steps.push_controllers.outputs.digest }}
+
       - name: Create GitHub Release with JReleaser
         uses: jreleaser/release-action@90ac653bb9c79d11179e65d81499f3f34527dcd5 # v 2.5.0
         with:
@@ -119,7 +136,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add control-plane/Chart.yaml control-plane/Chart.lock proxy/Chart.yaml web-ui/Chart.yaml
+          git add control-plane/Chart.yaml control-plane/Chart.lock proxy/Chart.yaml web-ui/Chart.yaml controllers/Chart.yaml
           git commit -m "chore: sync chart versions to ${VERSION}"
           git push origin main
 

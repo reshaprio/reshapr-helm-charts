@@ -1,0 +1,49 @@
+{{- if and (not .Values.operator.enabled) (not .Values.admissionController.enabled) }}
+WARNING: Both components are disabled. Nothing was deployed.
+Enable at least one of `operator.enabled` or `admissionController.enabled`.
+{{- else }}
+reShapr Controllers {{ .Chart.AppVersion }} has been deployed in namespace "{{ .Release.Namespace }}".
+
+Components installed:
+{{- if .Values.operator.enabled }}
+  [x] Operator             (deployment/{{ include "controllers.fullname" . }}-operator)
+{{- else }}
+  [ ] Operator             (disabled)
+{{- end }}
+{{- if .Values.admissionController.enabled }}
+  [x] Admission webhook    (deployment/{{ include "controllers.fullname" . }}-admission)
+{{- else }}
+  [ ] Admission webhook    (disabled)
+{{- end }}
+
+Check the rollout status with:
+
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+
+{{- if .Values.operator.enabled }}
+
+Operator: before it can reconcile resources, register its ServiceAccount as a trusted client
+on the control plane (see the "Operator" section of the chart README):
+
+  reshapr admin service-account create {{ .Release.Namespace }}-operator \
+    --k8s-subject {{ .Release.Namespace }}:{{ include "controllers.operator.serviceAccountName" . }} \
+    --allowed-organizations '["*"]' --validity-days 90
+{{- end }}
+{{- if .Values.admissionController.enabled }}
+
+Admission webhook: TLS provider = "{{ .Values.admissionController.certificate.provider }}".
+{{- if eq .Values.admissionController.certificate.provider "cert-manager" }}
+  cert-manager must be installed in the cluster; it issues the serving certificate and injects
+  the CA bundle into the MutatingWebhookConfiguration automatically.
+{{- else if eq .Values.admissionController.certificate.provider "openshift" }}
+  The OpenShift service-ca-operator provisions the serving certificate and injects the CA bundle.
+{{- else if eq .Values.admissionController.certificate.provider "existing" }}
+  Make sure the Secret "{{ .Values.admissionController.certificate.existing.secretName }}" exists in
+  namespace "{{ .Release.Namespace }}"{{ if not .Values.admissionController.certificate.caBundle }} and set `admissionController.certificate.caBundle` (or inject it out-of-band){{ end }}.
+{{- end }}
+
+Verify the webhook registration:
+
+  kubectl get mutatingwebhookconfigurations {{ include "controllers.fullname" . }}-mutating-webhook
+{{- end }}
+{{- end }}

@@ -1,4 +1,15 @@
 {{- if .Values.admissionController.enabled }}
+{{- $cert := .Values.admissionController.certificate }}
+{{- $provider := $cert.provider }}
+{{- $pemMode := or (eq $provider "openshift") (and (eq $provider "existing") (eq $cert.existing.type "pem")) }}
+{{- $tlsSecretName := "" }}
+{{- if eq $provider "cert-manager" }}
+{{- $tlsSecretName = printf "%s-admission-tls" (include "controllers.fullname" .) }}
+{{- else if eq $provider "openshift" }}
+{{- $tlsSecretName = printf "%s-admission-tls" (include "controllers.fullname" .) }}
+{{- else }}
+{{- $tlsSecretName = $cert.existing.secretName }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,12 +28,16 @@ spec:
       labels:
         {{- include "controllers.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: admission
+      {{- with .Values.admissionController.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "controllers.serviceAccountName" . }}
+      serviceAccountName: {{ include "controllers.admission.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -33,15 +48,44 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.admissionController.image.repository }}:{{ .Values.admissionController.image.tag }}"
+          image: {{ include "controllers.admission.image" . | quote }}
           imagePullPolicy: {{ .Values.admissionController.image.pullPolicy }}
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- if $pemMode }}
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_FILES
+              value: /etc/certs/tls.crt
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES
+              value: /etc/certs/tls.key
+            {{- else }}
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_KEY_STORE_FILE
+              value: /etc/certs/keystore.p12
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_KEY_STORE_FILE_TYPE
+              value: PKCS12
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_KEY_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if eq $provider "cert-manager" }}
+                  name: {{ include "controllers.fullname" . }}-admission-tls-pass
+                  key: password
+                  {{- else }}
+                  name: {{ $cert.existing.passwordSecretName }}
+                  key: {{ $cert.existing.passwordKey }}
+                  {{- end }}
+            {{- end }}
           ports:
-            - name: webhook
-              containerPort: 8443
+            - name: http
+              containerPort: {{ .Values.admissionController.httpContainerPort }}
+              protocol: TCP
+            - name: https
+              containerPort: {{ .Values.admissionController.httpsContainerPort }}
               protocol: TCP
           volumeMounts:
             - name: certs
-              mountPath: /tmp/k8s-webhook-server/serving-certs
+              mountPath: /etc/certs
               readOnly: true
           {{- with .Values.admissionController.resources }}
           resources:
@@ -51,7 +95,8 @@ spec:
         - name: certs
           secret:
             defaultMode: 420
-            secretName: {{ include "controllers.fullname" . }}-webhook-cert
+            optional: false
+            secretName: {{ $tlsSecretName }}
       {{- with .Values.admissionController.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

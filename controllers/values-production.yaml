@@ -1,0 +1,41 @@
+# Production overrides for the reshapr-controllers chart.
+# Usage: helm install reshapr-controllers . -n reshapr-system --create-namespace -f values-production.yaml
+
+operator:
+  enabled: true
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+admissionController:
+  enabled: true
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  # cert-manager is the recommended production provider. Switch to `openshift` on OpenShift/OKD,
+  # or to `existing` to bring your own certificate (see the chart README).
+  certificate:
+    provider: cert-manager
+  # Spread webhook replicas across nodes for resilience.
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - admission
+            topologyKey: kubernetes.io/hostname

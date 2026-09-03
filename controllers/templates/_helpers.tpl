@@ -51,12 +51,62 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Name of the operator ServiceAccount to use
 */}}
-{{- define "controllers.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "controllers.fullname" .) .Values.serviceAccount.name }}
+{{- define "controllers.operator.serviceAccountName" -}}
+{{- if .Values.operator.serviceAccount.create }}
+{{- default (printf "%s-operator" (include "controllers.fullname" .)) .Values.operator.serviceAccount.name }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" .Values.operator.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+Name of the admission webhook ServiceAccount to use
+*/}}
+{{- define "controllers.admission.serviceAccountName" -}}
+{{- if .Values.admissionController.serviceAccount.create }}
+{{- default (printf "%s-admission" (include "controllers.fullname" .)) .Values.admissionController.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.admissionController.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Operator image reference (falls back to the chart appVersion when no tag is set)
+*/}}
+{{- define "controllers.operator.image" -}}
+{{- printf "%s:%s" .Values.operator.image.repository (default .Chart.AppVersion .Values.operator.image.tag) }}
+{{- end }}
+
+{{/*
+Admission webhook image reference (falls back to the chart appVersion when no tag is set)
+*/}}
+{{- define "controllers.admission.image" -}}
+{{- printf "%s:%s" .Values.admissionController.image.repository (default .Chart.AppVersion .Values.admissionController.image.tag) }}
+{{- end }}
+
+{{/*
+Name of the admission webhook Service
+*/}}
+{{- define "controllers.admission.serviceName" -}}
+{{- printf "%s-admission" (include "controllers.fullname" .) }}
+{{- end }}
+
+{{/*
+Resolve the PKCS12 keystore password for the cert-manager provider.
+Uses an explicit value, otherwise reuses the already-generated password, otherwise generates one.
+*/}}
+{{- define "controllers.admission.keystorePassword" -}}
+{{- $pwd := .Values.admissionController.certificate.certManager.keystorePassword -}}
+{{- if not $pwd -}}
+{{- $secretName := printf "%s-admission-tls-pass" (include "controllers.fullname" .) -}}
+{{- $existing := lookup "v1" "Secret" .Release.Namespace $secretName -}}
+{{- if and $existing $existing.data (index $existing.data "password") -}}
+{{- $pwd = index $existing.data "password" | b64dec -}}
+{{- else -}}
+{{- $pwd = randAlphaNum 24 -}}
+{{- end -}}
+{{- end -}}
+{{- $pwd -}}
 {{- end }}

@@ -24,4 +24,5 @@ files:
     - path: 'packaged/reshapr-control-plane-{{projectVersion}}.tgz'
     - path: 'packaged/reshapr-proxy-{{projectVersion}}.tgz'
     - path: 'packaged/reshapr-web-ui-{{projectVersion}}.tgz'
+    - path: 'packaged/reshapr-controllers-{{projectVersion}}.tgz'
 

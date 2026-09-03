@@ -17,12 +17,16 @@ spec:
       labels:
         {{- include "controllers.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: operator
+      {{- with .Values.operator.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "controllers.serviceAccountName" . }}
+      serviceAccountName: {{ include "controllers.operator.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -33,12 +37,34 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.operator.image.repository }}:{{ .Values.operator.image.tag }}"
+          image: {{ include "controllers.operator.image" . | quote }}
           imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: {{ include "controllers.fullname" . }}-operator
+            {{- with .Values.operator.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: sa-token
+              mountPath: /var/run/secrets/reshapr/serviceaccount
           {{- with .Values.operator.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      volumes:
+        - name: sa-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  # Must match the control plane's hardcoded EXPECTED_AUDIENCE (KubernetesTokenVerifier).
+                  audience: https://app.reshapr.io
+                  expirationSeconds: {{ .Values.operator.controlPlane.tokenExpirationSeconds }}
+                  path: token
       {{- with .Values.operator.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

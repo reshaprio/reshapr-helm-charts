@@ -1,7 +1,18 @@
-# Default values for controllers.
+# Default values for the reshapr-controllers chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+#
+# The chart ships two independent components that can be enabled separately or together:
+#   * operator            -> reconciles reShapr Custom Resources
+#   * admissionController  -> mutating webhook injecting the reShapr proxy sidecar into Pods
+#
+# Install only the operator            : --set admissionController.enabled=false
+# Install only the admission webhook   : --set operator.enabled=false
+# Install both (default)               : no override needed
 
+# ---------------------------------------------------------------------------
+# Operator
+# ---------------------------------------------------------------------------
 operator:
   # -- Enable the operator component
   enabled: true
@@ -10,15 +21,35 @@ operator:
   image:
     # -- Image repository for the operator
     repository: registry.reshapr.io/reshapr/reshapr-operator
-    # -- Image tag for the operator
-    tag: "nightly"
+    # -- Image tag for the operator. Defaults to the chart appVersion when left empty.
+    tag: ""
     # -- Image pull policy
     pullPolicy: IfNotPresent
+  # -- Extra environment variables to inject into the operator container
+  extraEnv: []
+  controlPlane:
+    # -- Expiration (seconds) of the projected ServiceAccount token used to authenticate to the
+    # reShapr control plane. The token audience is fixed to https://app.reshapr.io to match the
+    # control plane's expected audience and is therefore not configurable.
+    tokenExpirationSeconds: 3600
+  rbac:
+    # -- Create the RBAC ClusterRole/ClusterRoleBinding for the operator
+    create: true
+    # -- Create the dedicated secret-reader ClusterRole/ClusterRoleBinding used by the SecretSource reconciler.
+    # Set to false (or replace with namespaced RoleBindings) to scope or disable SecretSource Secret reads.
+    createSecretReader: true
+  serviceAccount:
+    # -- Create a dedicated ServiceAccount for the operator
+    create: true
+    # -- Annotations to add to the operator ServiceAccount
+    annotations: {}
+    # -- Name of the operator ServiceAccount. Generated from the fullname template when empty.
+    name: ""
   # -- Resource requests and limits for the operator pod
   resources: {}
     # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
+    #   cpu: 500m
+    #   memory: 256Mi
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
@@ -28,7 +59,12 @@ operator:
   tolerations: []
   # -- Affinity rules for pod assignment
   affinity: {}
+  # -- Pod annotations for the operator
+  podAnnotations: {}
 
+# ---------------------------------------------------------------------------
+# Admission Controller (mutating webhook)
+# ---------------------------------------------------------------------------
 admissionController:
   # -- Enable the admission webhook component
   enabled: true
@@ -37,15 +73,72 @@ admissionController:
   image:
     # -- Image repository for the admission webhook
     repository: registry.reshapr.io/reshapr/reshapr-admission
-    # -- Image tag for the admission webhook
-    tag: "nightly"
+    # -- Image tag for the admission webhook. Defaults to the chart appVersion when left empty.
+    tag: ""
     # -- Image pull policy
     pullPolicy: IfNotPresent
   service:
-    # -- The port the admission webhook service listens on
-    port: 8443
-    # -- The target port of the admission webhook container
-    targetPort: 8443
+    # -- Type of the admission webhook Service
+    type: ClusterIP
+    # -- HTTP port exposed by the Service (probes / plain traffic)
+    httpPort: 80
+    # -- HTTPS port exposed by the Service (called by the Kubernetes API server)
+    httpsPort: 443
+  # -- Container port serving plain HTTP (health / metrics)
+  httpContainerPort: 8080
+  # -- Container port serving HTTPS (the webhook endpoint)
+  httpsContainerPort: 443
+  webhook:
+    # -- Path served by the mutating webhook
+    path: /mutate
+    # -- Timeout (seconds) the API server waits for the webhook response
+    timeoutSeconds: 5
+    # -- failurePolicy: Ignore (fail open, recommended) or Fail
+    failurePolicy: Ignore
+    # -- Namespaces excluded from interception. The release namespace is always added automatically.
+    excludedNamespaces:
+      - kube-system
+      - kube-node-lease
+      - kube-public
+  # -- TLS bootstrap configuration for the webhook serving certificate.
+  # See the "Alternatives to cert-manager" section of the chart README for details.
+  certificate:
+    # -- Provider used to obtain the serving certificate.
+    # One of: cert-manager (default), openshift, existing
+    provider: cert-manager
+    # cert-manager provider settings
+    certManager:
+      # -- Validity duration of the issued certificate
+      duration: 2160h
+      # -- Renew the certificate this long before expiry
+      renewBefore: 360h
+      # -- Password protecting the generated PKCS12 keystore. A random value is generated (and
+      # preserved across upgrades) when left empty.
+      keystorePassword: ""
+      # -- Use an existing cert-manager Issuer/ClusterIssuer instead of the self-signed Issuer
+      # created by the chart. When set, no Issuer is created. Example: {name: my-issuer, kind: ClusterIssuer}
+      issuerRef: {}
+    # existing provider settings (Bring-Your-Own certificate or Kubernetes CSR API)
+    existing:
+      # -- Format of the certificate material in the Secret: pkcs12 or pem
+      type: pkcs12
+      # -- Name of the Secret holding the serving certificate (keystore.p12 for pkcs12, tls.crt/tls.key for pem)
+      secretName: reshapr-admission-controller-tls-secret
+      # -- (pkcs12 only) Name of the Secret holding the keystore password
+      passwordSecretName: reshapr-admission-controller-tls-pass
+      # -- (pkcs12 only) Key of the password inside passwordSecretName
+      passwordKey: password
+    # -- Base64-encoded PEM of the CA that signed the serving certificate. Injected into the
+    # webhook clientConfig.caBundle for the "existing" provider. Leave empty when the CA bundle
+    # is injected out-of-band (e.g. cert-manager or OpenShift service-ca annotations).
+    caBundle: ""
+  serviceAccount:
+    # -- Create a dedicated ServiceAccount for the admission webhook
+    create: true
+    # -- Annotations to add to the admission webhook ServiceAccount
+    annotations: {}
+    # -- Name of the admission webhook ServiceAccount. Generated from the fullname template when empty.
+    name: ""
   # -- Resource requests and limits for the admission webhook pod
   resources: {}
   # -- Node labels for pod assignment
@@ -54,21 +147,18 @@ admissionController:
   tolerations: []
   # -- Affinity rules for pod assignment
   affinity: {}
+  # -- Pod annotations for the admission webhook
+  podAnnotations: {}
 
+# ---------------------------------------------------------------------------
+# Global
+# ---------------------------------------------------------------------------
 # -- Image pull secrets to access private registries
 imagePullSecrets: []
 # -- Override the name of the chart
 nameOverride: ""
 # -- Override the fully qualified app name
 fullnameOverride: ""
-
-serviceAccount:
-  # -- Specifies whether a service account should be created
-  create: true
-  # -- Annotations to add to the service account
-  annotations: {}
-  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
-  name: ""
 
 # -- Empty podSecurityContext to allow OpenShift restricted-v2 SCC to inject UIDs
 podSecurityContext: {}

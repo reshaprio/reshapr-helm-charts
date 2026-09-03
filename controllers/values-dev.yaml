@@ -1,0 +1,16 @@
+# Development overrides for the reshapr-controllers chart.
+# Usage: helm install reshapr-controllers . -n reshapr-system --create-namespace -f values-dev.yaml
+
+operator:
+  enabled: true
+  image:
+    tag: nightly
+    pullPolicy: Always
+
+admissionController:
+  enabled: true
+  image:
+    tag: nightly
+    pullPolicy: Always
+  certificate:
+    provider: cert-manager
