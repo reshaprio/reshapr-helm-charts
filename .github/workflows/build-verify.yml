@@ -1,0 +1,63 @@
+name: build-verify-package
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+    paths-ignore:
+      #- '.github/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - '.github/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '*.md'
+permissions: read-all
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        chart:
+          - control-plane
+          - proxy
+          - web-ui
+          - controllers
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+
+      - name: Update chart dependencies
+        run: |
+          if grep -q '^dependencies:' "./${{ matrix.chart }}/Chart.yaml"; then
+            helm repo add bitnami https://charts.bitnami.com/bitnami
+            helm repo update
+            helm dependency update "./${{ matrix.chart }}"
+          fi
+
+      - name: Helm lint
+        run: helm lint "./${{ matrix.chart }}"
+
+      - name: Install kubeconform
+        run: |
+          KUBECONFORM_VERSION=v0.6.7
+          curl -sSfL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | tar -xz -C /usr/local/bin kubeconform
+          kubeconform -v
+
+      - name: Helm template & validate (kubeconform)
+        # -ignore-missing-schemas skips CRD-based resources (cert-manager, reshapr.io) that have no built-in schema.
+        run: |
+          helm template "${{ matrix.chart }}" "./${{ matrix.chart }}" \
+            | kubeconform -strict -summary -ignore-missing-schemas
