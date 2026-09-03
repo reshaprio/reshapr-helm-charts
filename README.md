@@ -2,7 +2,8 @@
 
 Helm Charts for installing reShapr components on Kubernetes
 
-[![Helm](https://img.shields.io/badge/dynamic/json?color=0F1689&logo=helm&style=for-the-badge&label=Helm&query=tags[1].name&url=https://quay.io/api/v1/repository/reshapr/reshapr-helm-charts/reshapr-control-plane/tag/?limit=10&page=1&onlyActiveTags=true)](https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-control-plane?tab=tags)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/reshaprio/reshapr-helm-charts/build-verify.yml?logo=github&style=for-the-badge)](https://github.com/reshaprio/reshapr-helm-charts/actions)
+[![Version](https://img.shields.io/badge/dynamic/json?color=0F1689&logo=helm&style=for-the-badge&label=Version&query=tags[1].name&url=https://quay.io/api/v1/repository/reshapr/reshapr-helm-charts/reshapr-control-plane/tag/?limit=10&page=1&onlyActiveTags=true)](https://quay.io/repository/reshapr/reshapr-helm-charts/reshapr-control-plane?tab=tags)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-%E2%89%A51.25-blue?style=for-the-badge&logo=kubernetes)](https://kubernetes.io/)
 [![License](https://img.shields.io/github/license/reshaprio/reshapr-helm-charts?style=for-the-badge&logo=apache)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Project Chat](https://img.shields.io/badge/discord-reshapr-pink.svg?color=7289da&style=for-the-badge&logo=discord)](https://discord.gg/KyDUdam34h)
