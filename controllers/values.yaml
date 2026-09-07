@@ -53,6 +53,33 @@ operator:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+
+  # -- Pod disruption budget for the operator
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+
+  # -- Health check configuration for the operator
+  healthCheck:
+    livenessProbe:
+      enabled: false
+      httpGet:
+        path: /q/health/live
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      enabled: false
+      httpGet:
+        path: /q/health/ready
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
   # -- Node labels for pod assignment
   nodeSelector: {}
   # -- Tolerations for pod assignment
@@ -141,6 +168,33 @@ admissionController:
     name: ""
   # -- Resource requests and limits for the admission webhook pod
   resources: {}
+
+  # -- Pod disruption budget for the admission webhook
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+
+  # -- Health check configuration for the admission webhook
+  healthCheck:
+    livenessProbe:
+      enabled: false
+      httpGet:
+        path: /q/health/live
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      enabled: false
+      httpGet:
+        path: /q/health/ready
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
   # -- Node labels for pod assignment
   nodeSelector: {}
   # -- Tolerations for pod assignment
