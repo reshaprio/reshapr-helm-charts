@@ -49,9 +49,13 @@ admin:
 apiKey:
   value: "dev-api-key-change-me-in-production"
 
-# Encryption key for development
+# Encryption keys for development
 encryptionKey:
   value: "dev-encryption-key-change-me-in-production"
+  keys:
+    v1:
+      value: "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
+      key: "encryption-key-v1"
 
 # No ingress, use port-forward for local development
 ingress:

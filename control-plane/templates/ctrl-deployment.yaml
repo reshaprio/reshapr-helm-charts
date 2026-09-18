@@ -1,3 +1,11 @@
+{{- if not (hasKey .Values.encryptionKey.keys .Values.encryptionKey.activeKeyId) }}
+{{- fail (printf "encryptionKey.activeKeyId %q must identify an entry in encryptionKey.keys" .Values.encryptionKey.activeKeyId) }}
+{{- end }}
+{{- range $kid, $_ := .Values.encryptionKey.keys }}
+{{- if not (regexMatch "^[a-z][a-z0-9]*$" $kid) }}
+{{- fail (printf "encryptionKey key id %q must start with a lowercase letter and contain only lowercase letters and digits" $kid) }}
+{{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -89,7 +97,16 @@ spec:
                 secretKeyRef:
                   name: {{ include "reshapr-ctrl-plane.apiKeySecretName" . }}
                   key: {{ .Values.apiKey.key }}
-            - name: RESHAPR_ENCRYPTION_KEY
+            - name: RESHAPR_ENCRYPTION_ACTIVE_KEY_ID
+              value: {{ .Values.encryptionKey.activeKeyId | quote }}
+            {{- range $kid, $keyConfig := .Values.encryptionKey.keys }}
+            - name: RESHAPR_ENCRYPTION_KEYS_{{ $kid | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "reshapr-ctrl-plane.encryptionKeySecretName" $ }}
+                  key: {{ $keyConfig.key }}
+            {{- end }}
+            - name: RESHAPR_ENCRYPTION_LEGACY_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "reshapr-ctrl-plane.encryptionKeySecretName" . }}

@@ -168,11 +168,41 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 
 ### Encryption Key Parameters
 
-| Parameter                      | Description                                                                       | Default            |
-|--------------------------------|----------------------------------------------------------------------------------|--------------------|
-| `encryptionKey.value`          | Encryption key for sensitive data (should be overridden in production) - must be 16, 24 or 32 characters long | `""`               |
-| `encryptionKey.existingSecret` | Existing secret for encryption key                                               | `""`               |
-| `encryptionKey.key`            | Key in the existing secret for encryption key                                    | `encryption-key`   |
+| Parameter                              | Description                                                                  | Default             |
+|----------------------------------------|------------------------------------------------------------------------------|---------------------|
+| `encryptionKey.activeKeyId`            | Key identifier used for new encryption operations                            | `v1`                |
+| `encryptionKey.keys.<kid>.value`       | Base64-encoded 32-byte AES-256 key (when the chart creates the Secret)       | `""`                |
+| `encryptionKey.keys.<kid>.key`         | Kubernetes Secret data key containing this AES-256 key                       | `encryption-key-v1` |
+| `encryptionKey.value`                  | Legacy AES/ECB key retained while existing data is migrated (must be 16, 24 or 32 characters long) | `""` |
+| `encryptionKey.existingSecret`         | Existing Secret containing every AES-256 key and the legacy key              | `""`                |
+| `encryptionKey.key`                    | Kubernetes Secret data key containing the legacy AES/ECB key                 | `encryption-key`    |
+
+Each key identifier (`kid`) becomes the prefix of newly encrypted values and must start with a lowercase
+letter and contain only lowercase letters and digits. For production, create the Secret outside Helm:
+
+```bash
+kubectl create secret generic reshapr-encryption-key-secret \
+  --from-literal=encryption-key-v1="$(openssl rand -base64 32)" \
+  --from-literal=encryption-key='<current-legacy-key>' \
+  --namespace reshapr-system
+```
+
+Then reference all keys that must remain available for decryption:
+
+```yaml
+encryptionKey:
+  existingSecret: reshapr-encryption-key-secret
+  activeKeyId: v2
+  keys:
+    v1:
+      key: encryption-key-v1
+    v2:
+      key: encryption-key-v2
+  key: encryption-key
+```
+
+During rotation, add the new AES-256 key to the Secret and `keys`, then switch `activeKeyId`. Keep prior
+AES keys until no value uses their prefix, and keep the legacy key until all unprefixed values are migrated.
 
 ### JWT Keys Parameters
 

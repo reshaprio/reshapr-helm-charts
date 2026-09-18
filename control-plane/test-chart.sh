@@ -53,17 +53,38 @@ else
     exit 1
 fi
 
-# Test 5: Check required templates exist
-echo "Test 5: Checking required templates..."
+# Test 5: Render multiple encryption keys
+echo "Test 5: Rendering multiple encryption keys..."
+ENCRYPTION_MANIFEST="/tmp/test-encryption-manifests-$$.yaml"
+helm template test . -f values-dev.yaml \
+    --set encryptionKey.activeKeyId=v2 \
+    --set encryptionKey.keys.v2.value=ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj8= \
+    --set encryptionKey.keys.v2.key=encryption-key-v2 \
+    > "$ENCRYPTION_MANIFEST"
+
+if grep -q 'name: RESHAPR_ENCRYPTION_KEYS_V1' "$ENCRYPTION_MANIFEST" && \
+   grep -q 'name: RESHAPR_ENCRYPTION_KEYS_V2' "$ENCRYPTION_MANIFEST" && \
+   grep -q 'name: RESHAPR_ENCRYPTION_LEGACY_KEY' "$ENCRYPTION_MANIFEST"; then
+    echo -e "${GREEN}✓${NC} Multiple encryption keys rendering passed"
+else
+    echo -e "${RED}✗${NC} Multiple encryption keys rendering failed"
+    rm -f "$ENCRYPTION_MANIFEST"
+    exit 1
+fi
+rm -f "$ENCRYPTION_MANIFEST"
+
+# Test 6: Check required templates exist
+echo "Test 6: Checking required templates..."
 REQUIRED_TEMPLATES=(
     "templates/_helpers.tpl"
     "templates/ctrl-deployment.yaml"
-    "templates/ctrl-service.yaml"
+    "templates/ctrl-services.yaml"
     "templates/ctrl-serviceaccount.yaml"
     "templates/ingress.yaml"
     "templates/secret-api-key.yaml"
-    "templates/secret-authz-admin.yaml"
+    "templates/secret-admin-credentials.yaml"
     "templates/secret-database.yaml"
+    "templates/secret-encryption-key.yaml"
 )
 
 for template in "${REQUIRED_TEMPLATES[@]}"; do
@@ -75,17 +96,17 @@ for template in "${REQUIRED_TEMPLATES[@]}"; do
     fi
 done
 
-# Test 6: Check dependencies
-echo "Test 6: Checking dependencies..."
-if [ -f "Chart.lock" ] && [ -d "charts/postgresql" ]; then
+# Test 7: Check dependencies
+echo "Test 7: Checking dependencies..."
+if [ -f "Chart.lock" ] && compgen -G "charts/postgresql-*.tgz" > /dev/null; then
     echo -e "${GREEN}✓${NC} Dependencies are installed"
 else
     echo -e "${RED}✗${NC} Dependencies are missing (run 'helm dependency build')"
     exit 1
 fi
 
-# Test 7: Validate rendered manifests
-echo "Test 7: Validating rendered manifests..."
+# Test 8: Validate rendered manifests
+echo "Test 8: Validating rendered manifests..."
 MANIFEST_FILE="/tmp/test-manifests-$$.yaml"
 helm template test . -f values-dev.yaml > "$MANIFEST_FILE"
 

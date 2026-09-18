@@ -11,6 +11,7 @@ helm install reshapr-control-plane ./control-plane \
   --set postgresql.auth.password=admin \
   --set apiKey.value=dev-api-key-change-me-in-production \
   --set encryptionKey.value=dev-encryption-key-change-me-in-production \
+  --set encryptionKey.keys.v1.value=AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8= \
   --set admin.nameValue=admin \
   --set admin.passwordValue=password \
   --set admin.emailValue=reshapr@example.com \
@@ -48,6 +49,11 @@ kubectl create secret generic reshapr-authz-admin-secret \
 
 kubectl create secret generic reshapr-api-key-secret \
   --from-literal=api-key='your-very-long-random-api-key' \
+  --namespace reshapr-system
+
+kubectl create secret generic reshapr-encryption-key-secret \
+  --from-literal=encryption-key-v1="$(openssl rand -base64 32)" \
+  --from-literal=encryption-key='your-current-legacy-encryption-key' \
   --namespace reshapr-system
 
 # Install the chart

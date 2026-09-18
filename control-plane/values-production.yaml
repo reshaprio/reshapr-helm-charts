@@ -91,11 +91,16 @@ apiKey:
   key: "api-key"
 
 # =============================================================================
-# Use existing secret for encryption key for sensitive data (e.g., tokens) in ctrl + database component
+# Use an existing secret for AES-256 and legacy encryption keys
 encryptionKey:
   value: ""
   existingSecret: "reshapr-encryption-key-secret"
   key: "encryption-key"
+  activeKeyId: "v1"
+  keys:
+    v1:
+      value: ""
+      key: "encryption-key-v1"
 
 # JWT keys for signing and verifying tokens in ctrl component
 jwtKeys:

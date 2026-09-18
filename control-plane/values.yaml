@@ -249,13 +249,22 @@ apiKey:
 # =============================================================================
 # Keys for encrypting sensitive data (in database or authorization tokens)
 # =============================================================================
-# -- Encryption key for sensitive data (e.g., tokens) in ctrl + database component
+# -- Encryption keys for sensitive data (e.g., tokens) in ctrl + database component
 encryptionKey:
-  # -- The encryption key value (should be overridden in production) - must be 16, 24 or 32 characters long.
+  # -- Identifier of the AES-256 key used for new encryption operations
+  activeKeyId: "v1"
+  # -- AES-256 keys indexed by key identifier. Values must be Base64-encoded 32-byte keys.
+  keys:
+    v1:
+      # -- Base64-encoded AES-256 key value (should be overridden in production)
+      value: ""
+      # -- Key in the Kubernetes Secret for this AES-256 key
+      key: "encryption-key-v1"
+  # -- Legacy AES/ECB key retained during migration - must be 16, 24 or 32 characters long
   value: ""
-  # -- Use existing secret for encryption key
+  # -- Use an existing Secret containing all AES-256 keys and the legacy key
   existingSecret: ""
-  # -- Key in the existing secret for encryption key
+  # -- Key in the Kubernetes Secret for the legacy AES/ECB key
   key: "encryption-key"
 
 # -- JWT keys for signing and verifying tokens in ctrl component
