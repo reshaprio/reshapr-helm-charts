@@ -12,6 +12,35 @@ operator:
       cpu: 100m
       memory: 128Mi
 
+  # Enable Pod Disruption Budget for HA
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  # Select specific nodes for control plane
+  nodeSelector:
+    node-role.kubernetes.io/worker: "true"
+
+  healthCheck:
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/live
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/ready
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+
 admissionController:
   enabled: true
   replicaCount: 2
@@ -39,3 +68,36 @@ admissionController:
                   values:
                     - admission
             topologyKey: kubernetes.io/hostname
+
+  # Enable Pod Disruption Budget for HA
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  # Select specific nodes for control plane
+  nodeSelector:
+    node-role.kubernetes.io/worker: "true"
+
+  healthCheck:
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/live
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /q/health/ready
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+# Image pull secrets for private registry
+imagePullSecrets:
+  - name: ghcr-pull-secret
