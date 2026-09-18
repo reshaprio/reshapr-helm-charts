@@ -1,5 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
+{{- $bodySizeLimitOverridden := false }}
+{{- range .Values.extraEnv }}
+{{- if eq .name "BODY_SIZE_LIMIT" }}
+{{- $bodySizeLimitOverridden = true }}
+{{- end }}
+{{- end }}
 metadata:
   name: {{ include "reshapr-web-ui.fullname" . }}
   namespace: {{ .Release.Namespace }}
@@ -60,6 +66,10 @@ spec:
             {{- if .Values.publicUrl }}
             - name: RESHAPR_WEBUI_PUBLIC_URL
               value: {{ .Values.publicUrl | quote }}
+            {{- end }}
+            {{- if not $bodySizeLimitOverridden }}
+            - name: BODY_SIZE_LIMIT
+              value: "12M"
             {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}

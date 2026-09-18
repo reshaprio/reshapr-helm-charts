@@ -49,8 +49,25 @@ else
     exit 1
 fi
 
-# Test 5: Check required templates exist
-echo "Test 5: Checking required templates..."
+# Test 5: Validate the request body size default and override
+echo "Test 5: Validating BODY_SIZE_LIMIT configuration..."
+DEFAULT_MANIFEST=$(helm template test .)
+OVERRIDE_MANIFEST=$(helm template test . \
+    --set 'extraEnv[0].name=BODY_SIZE_LIMIT' \
+    --set 'extraEnv[0].value=24M')
+
+if [ "$(echo "$DEFAULT_MANIFEST" | grep -c 'name: BODY_SIZE_LIMIT')" -eq 1 ] && \
+    echo "$DEFAULT_MANIFEST" | grep -A1 'name: BODY_SIZE_LIMIT' | grep -q 'value: "12M"' && \
+    [ "$(echo "$OVERRIDE_MANIFEST" | grep -c 'name: BODY_SIZE_LIMIT')" -eq 1 ] && \
+    echo "$OVERRIDE_MANIFEST" | grep -A1 'name: BODY_SIZE_LIMIT' | grep -q 'value: 24M'; then
+    echo -e "${GREEN}✓${NC} BODY_SIZE_LIMIT default and override passed"
+else
+    echo -e "${RED}✗${NC} BODY_SIZE_LIMIT default or override failed"
+    exit 1
+fi
+
+# Test 6: Check required templates exist
+echo "Test 6: Checking required templates..."
 REQUIRED_TEMPLATES=(
     "templates/_helpers.tpl"
     "templates/deployment.yaml"
@@ -70,8 +87,8 @@ for template in "${REQUIRED_TEMPLATES[@]}"; do
     fi
 done
 
-# Test 6: Validate rendered manifests
-echo "Test 6: Validating rendered manifests..."
+# Test 7: Validate rendered manifests
+echo "Test 7: Validating rendered manifests..."
 MANIFEST_FILE="/tmp/test-manifests-$$.yaml"
 helm template test . -f values-dev.yaml > "$MANIFEST_FILE"
 

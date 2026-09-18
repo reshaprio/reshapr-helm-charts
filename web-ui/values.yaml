@@ -136,7 +136,7 @@ apiKey:
 # -- The public URL of the web-ui application (used for CORS, redirects, etc.)
 publicUrl: ""
 
-# -- Extra environment variables
+# -- Extra environment variables. BODY_SIZE_LIMIT defaults to 12M and can be overridden here.
 extraEnv: []
 
 # -- Extra volume mounts

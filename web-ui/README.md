@@ -82,6 +82,7 @@ helm install reshapr-web-ui ./web-ui \
 | `apiKey.existingSecret` | Existing secret for API key | `""` |
 | `apiKey.key` | Key in secret | `api-key` |
 | `publicUrl` | Web UI public URL | `""` |
+| `extraEnv` | Extra environment variables; use it to override the default `BODY_SIZE_LIMIT` of `12M` for example | `[]` |
 | `ingress.enabled` | Enable ingress | `false` |
 | `ingress.className` | Ingress class name | `""` |
 | `podDisruptionBudget.enabled` | Enable PDB | `false` |
@@ -89,6 +90,14 @@ helm install reshapr-web-ui ./web-ui \
 | `resources.limits.memory` | Memory limit | `256Mi` |
 | `resources.requests.cpu` | CPU request | `50m` |
 | `resources.requests.memory` | Memory request | `128Mi` |
+
+To override the maximum request body size accepted by the Web UI server:
+
+```yaml
+extraEnv:
+  - name: BODY_SIZE_LIMIT
+    value: "24M"
+```
 
 ## Security Considerations
 
