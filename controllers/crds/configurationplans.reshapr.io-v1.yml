@@ -27,9 +27,104 @@ spec:
                 items:
                   type: "string"
                 type: "array"
+              audit:
+                description: "Whether the audit log will be enabled and calls logged.\
+                  \ Default is false."
+                type: "boolean"
               backendEndpoint:
                 description: "Backend endpoint for this Configuration Plan"
                 type: "string"
+              cachePolicy:
+                description: "The cache policy to apply"
+                properties:
+                  cacheScope:
+                    description: "Optional scope of caching"
+                    type: "string"
+                  ttlMs:
+                    description: "Time-to-live in milliseconds for client-side MCP\
+                      \ caching"
+                    type: "integer"
+                type: "object"
+              excludedOperations:
+                description: "List of excluded operation names"
+                items:
+                  type: "string"
+                type: "array"
+              headerPolicy:
+                description: "Header propagation policy controlling which request/response\
+                  \ headers are forwarded to/from the backend"
+                properties:
+                  request:
+                    description: "Allow/deny/rename directives applied to headers\
+                      \ forwarded to the backend."
+                    properties:
+                      allow:
+                        description: "Header names explicitly allowed to be propagated.\
+                          \ When provided, only these headers are forwarded (minus\
+                          \ any restricted by default)."
+                        items:
+                          type: "string"
+                        type: "array"
+                      deny:
+                        description: "Header names explicitly denied from being propagated.\
+                          \ Takes precedence over the allow-list."
+                        items:
+                          type: "string"
+                        type: "array"
+                      rename:
+                        description: "Rename directives moving an incoming header\
+                          \ to a different name before propagation."
+                        items:
+                          properties:
+                            from:
+                              description: "Name of the incoming header to rename."
+                              type: "string"
+                            to:
+                              description: "Target header name the value is propagated\
+                                \ under."
+                              type: "string"
+                          type: "object"
+                        type: "array"
+                    type: "object"
+                  response:
+                    description: "Allow/deny/rename directives applied to headers\
+                      \ returned from the backend. Reserved for future use, not enforced\
+                      \ yet."
+                    properties:
+                      allow:
+                        description: "Header names explicitly allowed to be propagated.\
+                          \ When provided, only these headers are forwarded (minus\
+                          \ any restricted by default)."
+                        items:
+                          type: "string"
+                        type: "array"
+                      deny:
+                        description: "Header names explicitly denied from being propagated.\
+                          \ Takes precedence over the allow-list."
+                        items:
+                          type: "string"
+                        type: "array"
+                      rename:
+                        description: "Rename directives moving an incoming header\
+                          \ to a different name before propagation."
+                        items:
+                          properties:
+                            from:
+                              description: "Name of the incoming header to rename."
+                              type: "string"
+                            to:
+                              description: "Target header name the value is propagated\
+                                \ under."
+                              type: "string"
+                          type: "object"
+                        type: "array"
+                    type: "object"
+                type: "object"
+              includedOperations:
+                description: "List of included operation names"
+                items:
+                  type: "string"
+                type: "array"
               oauth2:
                 description: "OAuth2 Client Configuration"
                 properties:

@@ -6,11 +6,11 @@ metadata:
 spec:
   group: "reshapr.io"
   names:
-    kind: "Resource"
+    kind: "Resources"
     plural: "resources"
     shortNames:
-    - "rsrc"
-    singular: "resource"
+    - "res"
+    singular: "resources"
   scope: "Namespaced"
   versions:
   - name: "v1alpha1"
@@ -19,26 +19,142 @@ spec:
         properties:
           spec:
             properties:
-              service:
-                description: "Holds reference information about the Service this\
-                  \ resource artifact relates to."
-                properties:
-                  name:
-                    description: "Human readable name of the target Service for\
-                      \ resource artifacts."
-                    type: "string"
-                  version:
-                    description: "Human readable version of the target Service\
-                      \ for resource artifacts."
-                    type: "string"
+              resourceTemplates:
+                additionalProperties:
+                  properties:
+                    annotations:
+                      description: "Optional annotations for this resource template."
+                      properties:
+                        audience:
+                          description: "The intended audiences for this resource (e.g.\
+                            \ 'user', 'assistant')."
+                          items:
+                            type: "string"
+                          type: "array"
+                        lastModified:
+                          description: "The last modified date-time of this resource\
+                            \ (ISO 8601)."
+                          type: "string"
+                        priority:
+                          description: "The importance of this resource, from 0.0\
+                            \ (least) to 1.0 (most)."
+                          type: "number"
+                      type: "object"
+                    description:
+                      description: "Human readable long description of this resource\
+                        \ template."
+                      type: "string"
+                    icons:
+                      description: "Optional icons for this resource template."
+                      items:
+                        properties:
+                          mimeType:
+                            description: "The MIME type of this icon."
+                            type: "string"
+                          sizes:
+                            description: "Array of icon sizes (e.g. '32x32', '64x64')."
+                            items:
+                              type: "string"
+                            type: "array"
+                          src:
+                            description: "The source URI of this icon."
+                            type: "string"
+                        type: "object"
+                      type: "array"
+                    mimeType:
+                      description: "The MIME type of these resource templates."
+                      type: "string"
+                    name:
+                      description: "The name of this resource template."
+                      type: "string"
+                    title:
+                      description: "Human readable title of this resource template."
+                      type: "string"
+                  type: "object"
+                description: "The resource template definitions, keyed by URI template."
                 type: "object"
               resources:
                 additionalProperties:
+                  properties:
+                    annotations:
+                      description: "Optional annotations for this resource."
+                      properties:
+                        audience:
+                          description: "The intended audiences for this resource (e.g.\
+                            \ 'user', 'assistant')."
+                          items:
+                            type: "string"
+                          type: "array"
+                        lastModified:
+                          description: "The last modified date-time of this resource\
+                            \ (ISO 8601)."
+                          type: "string"
+                        priority:
+                          description: "The importance of this resource, from 0.0\
+                            \ (least) to 1.0 (most)."
+                          type: "number"
+                      type: "object"
+                    blob:
+                      description: "The base64 encoded binary content of this resource,\
+                        \ if applicable. Mutually exclusive with text and remoteContent."
+                      type: "string"
+                    description:
+                      description: "Human readable long description of this resource."
+                      type: "string"
+                    icons:
+                      description: "Optional icons for this resource."
+                      items:
+                        properties:
+                          mimeType:
+                            description: "The MIME type of this icon."
+                            type: "string"
+                          sizes:
+                            description: "Array of icon sizes (e.g. '32x32', '64x64')."
+                            items:
+                              type: "string"
+                            type: "array"
+                          src:
+                            description: "The source URI of this icon."
+                            type: "string"
+                        type: "object"
+                      type: "array"
+                    mimeType:
+                      description: "The MIME type of this resource."
+                      type: "string"
+                    name:
+                      description: "The name of this resource."
+                      type: "string"
+                    remoteContent:
+                      description: "The remote URI where this resource content can\
+                        \ be found, if applicable. Mutually exclusive with text and\
+                        \ blob."
+                      type: "string"
+                    size:
+                      description: "The size of this resource in bytes."
+                      type: "integer"
+                    text:
+                      description: "The text content of this resource, if applicable.\
+                        \ Mutually exclusive with blob and remoteContent."
+                      type: "string"
+                    title:
+                      description: "Human readable title of this resource."
+                      type: "string"
                   type: "object"
-                  x-kubernetes-preserve-unknown-fields: true
-                description: "The resource definitions, keyed by resource name."
+                description: "The resource definitions, keyed by URI."
                 type: "object"
-            type:
+              service:
+                description: "Holds reference information about the Service this resource\
+                  \ artifact relates to."
+                properties:
+                  name:
+                    description: "Human readable name of the target Service for custom\
+                      \ tools."
+                    type: "string"
+                  version:
+                    description: "Human readable version of the target Service for\
+                      \ custom tools."
+                    type: "string"
+                type: "object"
             type: "object"
           status:
             properties:

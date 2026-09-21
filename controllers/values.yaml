@@ -22,7 +22,7 @@ operator:
     # -- Image repository for the operator
     repository: registry.reshapr.io/reshapr/reshapr-operator
     # -- Image tag for the operator. Defaults to the chart appVersion when left empty.
-    tag: ""
+    tag: "nightly"
     # -- Image pull policy
     pullPolicy: IfNotPresent
   # -- Extra environment variables to inject into the operator container
@@ -74,7 +74,7 @@ admissionController:
     # -- Image repository for the admission webhook
     repository: registry.reshapr.io/reshapr/reshapr-admission
     # -- Image tag for the admission webhook. Defaults to the chart appVersion when left empty.
-    tag: ""
+    tag: "nightly"
     # -- Image pull policy
     pullPolicy: IfNotPresent
   service:

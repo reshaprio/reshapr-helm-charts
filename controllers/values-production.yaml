@@ -4,6 +4,12 @@
 operator:
   enabled: true
   replicaCount: 1
+  image:
+    # Use specific image tags instead of nightly in production
+    repository: registry.reshapr.io/reshapr/reshapr-operator
+    tag: "0.0.3"
+    pullPolicy: IfNotPresent
+
   resources:
     limits:
       cpu: 500m
@@ -15,6 +21,11 @@ operator:
 admissionController:
   enabled: true
   replicaCount: 2
+  image:
+    # Use specific image tags instead of nightly in production
+    repository: registry.reshapr.io/reshapr/reshapr-admission
+    tag: "0.0.3"
+    pullPolicy: IfNotPresent
   resources:
     limits:
       cpu: 300m
