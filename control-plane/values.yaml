@@ -217,6 +217,11 @@ authentication:
     # -- Additionnal OIDC scopes to request (comma-separated list) Exemple: "my-scope-1,my-scope-2"
     scopes: ""
 
+    # -- Exact final redirect URIs allowed for external browser clients (the embedded Web UI callback is added automatically)
+    allowedRedirectUris: []
+    # -- Allow CLI callbacks on HTTP loopback addresses using ports 5556-5599
+    allowCliLoopbackRedirect: true
+
     # -- Optional IDP access guard: only allow users whose JWT satisfies these constraints.
     guardAccess:
       # -- Restrict access to a specific IDP group (standard JWT `groups` claim)
@@ -323,3 +328,5 @@ reshapr-web-ui:
   # -- Control plane URL (supports Helm templates)
   controlPlane:
     url: "http://{{ .Release.Name }}-ctrl:5555"
+  # -- Public URL for the embedded Web UI (supports Helm templates)
+  # publicUrl: "https://app.reshapr.example.com"

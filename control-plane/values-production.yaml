@@ -84,6 +84,14 @@ admin:
   emailKey: "email"
   defaultGatewayTokensKey: "default-gateway-tokens"
 
+# External OIDC authentication example. The embedded Web UI callback is added
+# automatically from reshapr-web-ui.publicUrl when both components are enabled.
+authentication:
+  idp:
+    enabled: false
+    allowedRedirectUris: []
+    allowCliLoopbackRedirect: true
+
 # Use existing secret for API key
 apiKey:
   value: ""  # Leave empty when using existingSecret
@@ -141,6 +149,7 @@ imagePullSecrets:
 # =============================================================================
 reshapr-web-ui:
   enabled: false
+  # publicUrl: "https://app.reshapr.example.com"
   # When enabled, override apiKey.existingSecret to point to the
   # externally managed secret used by the control-plane:
   # apiKey:

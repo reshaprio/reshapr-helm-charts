@@ -120,6 +120,30 @@ rm -f "$MANIFEST_FILE"
 
 echo -e "${GREEN}✓${NC} Manifest validation passed"
 
+# Test 9: Render explicit and embedded Web UI OIDC redirect URIs
+echo "Test 9: Rendering OIDC redirect URI allow-list..."
+OIDC_MANIFEST="/tmp/test-oidc-manifests-$$.yaml"
+helm template test . \
+    --set authentication.idp.enabled=true \
+    --set-string 'authentication.idp.allowedRedirectUris[0]=https://client.example.com/oidc/callback' \
+    --set-string 'authentication.idp.allowedRedirectUris[1]=https://app.example.com/api/auth/callback/oidc' \
+    --set authentication.idp.allowCliLoopbackRedirect=false \
+    --set reshapr-web-ui.enabled=true \
+    --set-string reshapr-web-ui.publicUrl=https://app.example.com/ \
+    > "$OIDC_MANIFEST"
+
+if grep -q 'name: RESHAPR_AUTHENTICATION_IDP_ALLOWED_REDIRECT_URIS' "$OIDC_MANIFEST" && \
+   grep -q 'value: "https://client.example.com/oidc/callback,https://app.example.com/api/auth/callback/oidc"' "$OIDC_MANIFEST" && \
+   grep -q 'name: RESHAPR_AUTHENTICATION_IDP_ALLOW_CLI_LOOPBACK_REDIRECT' "$OIDC_MANIFEST" && \
+   grep -q 'value: "false"' "$OIDC_MANIFEST"; then
+    echo -e "${GREEN}✓${NC} OIDC redirect URI allow-list rendering passed"
+else
+    echo -e "${RED}✗${NC} OIDC redirect URI allow-list rendering failed"
+    rm -f "$OIDC_MANIFEST"
+    exit 1
+fi
+rm -f "$OIDC_MANIFEST"
+
 echo ""
 echo "=========================================="
 echo -e "${GREEN}All tests passed!${NC}"

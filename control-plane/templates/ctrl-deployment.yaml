@@ -134,6 +134,19 @@ spec:
             - name: RESHAPR_AUTHENTICATION_IDP_SCOPES
               value: {{ .Values.authentication.idp.scopes }}
             {{- end }}
+            {{- $allowedRedirectUris := concat (list) .Values.authentication.idp.allowedRedirectUris }}
+            {{- $webUi := index .Values "reshapr-web-ui" }}
+            {{- if and $webUi.enabled $webUi.publicUrl }}
+            {{- $webUiPublicUrl := tpl ($webUi.publicUrl | toString) . | trimSuffix "/" }}
+            {{- $allowedRedirectUris = append $allowedRedirectUris (printf "%s/api/auth/callback/oidc" $webUiPublicUrl) }}
+            {{- end }}
+            {{- $allowedRedirectUris = uniq $allowedRedirectUris }}
+            {{- if $allowedRedirectUris }}
+            - name: RESHAPR_AUTHENTICATION_IDP_ALLOWED_REDIRECT_URIS
+              value: {{ join "," $allowedRedirectUris | quote }}
+            {{- end }}
+            - name: RESHAPR_AUTHENTICATION_IDP_ALLOW_CLI_LOOPBACK_REDIRECT
+              value: {{ .Values.authentication.idp.allowCliLoopbackRedirect | quote }}
             {{- if .Values.authentication.idp.guardAccess.group }}
             - name: RESHAPR_AUTHENTICATION_IDP_GUARD_ACCESS_GROUP
               value: {{ .Values.authentication.idp.guardAccess.group }}

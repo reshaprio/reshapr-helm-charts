@@ -129,7 +129,7 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 |-----------------------------------|---------------------------------------------|-----------|
 | `admin.nameValue`                 | Admin account username                      | `""`      |
 | `admin.passwordValue`             | Admin account password                      | `""`      |
-| `admin.emamilValue`               | Admin account email                         | `""`      |
+| `admin.emailValue`                | Admin account email                         | `""`      |
 | `admin.defaultGatewayTokensValue` | CSV list of tokens for reshapr org gateways | `""`      |
 | `admin.existingSecret`            | Existing secret for Admin credentials       | `""`      |
 | `admin.nameKey`                   | Key in the secret for Admin username        | `""`      |
@@ -152,11 +152,32 @@ The following table lists the configurable parameters of the Reshapr Control Pla
 | `authentication.idp.clientIdKey`         | Key in the existing secret for client ID                  | `"client-id"`   |
 | `authentication.idp.clientSecretKey`     | Key in the existing secret for client secret              | `"client-secret"` |
 | `authentication.idp.scopes`              | Additional OIDC scopes to request (comma-separated list, e.g. `my-scope-1,my-scope-2`) | `""` |
+| `authentication.idp.allowedRedirectUris` | Exact final redirect URIs allowed for browser clients | `[]` |
+| `authentication.idp.allowCliLoopbackRedirect` | Allow CLI callbacks on HTTP loopback addresses using ports `5556-5599` | `true` |
 | `authentication.idp.guardAccess.group`   | Restrict access to a specific IDP group (standard JWT `groups` claim) | `""`   |
 | `authentication.idp.guardAccess.claim`   | Restrict access based on a claim `name=value` expression  | `""`            |
 | `authentication.idp.defaultOrganization.claim`       | Resolve default organization from a specific JWT claim | `""`      |
 | `authentication.idp.defaultOrganization.groupPrefix` | Resolve default organization from a JWT group prefix (e.g. `reshapr-org`) | `""` |
 | `authentication.idp.defaultOrganization.value`       | Use a specific default organization value | `""`                     |
+
+When the embedded Web UI is enabled and `reshapr-web-ui.publicUrl` is set, the chart automatically adds
+`<publicUrl>/api/auth/callback/oidc` to the control plane's allowed redirect URIs. Explicit entries are
+preserved and duplicates are removed:
+
+```yaml
+authentication:
+  idp:
+    enabled: true
+    allowedRedirectUris:
+      - https://another-client.example.com/oidc/callback
+
+reshapr-web-ui:
+  enabled: true
+  publicUrl: https://app.reshapr.example.com
+```
+
+This configuration renders both callbacks in `RESHAPR_AUTHENTICATION_IDP_ALLOWED_REDIRECT_URIS`. Set
+`authentication.idp.allowCliLoopbackRedirect` to `false` when CLI browser login is not required.
 
 ### API Key Parameters
 
