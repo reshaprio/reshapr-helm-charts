@@ -7,3 +7,7 @@ updates:
       day: sunday
     open-pull-requests-limit: 3
     rebase-strategy: disabled
+    ignore:
+      # Managed centrally in reshaprio/.github and replicated here; update there instead.
+      - dependency-name: "wow-actions/welcome"
+      - dependency-name: "actions/stale"
