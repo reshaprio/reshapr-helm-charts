@@ -83,6 +83,28 @@ spec:
             - name: https
               containerPort: {{ .Values.admissionController.httpsContainerPort }}
               protocol: TCP
+          {{- if .Values.admissionController.healthCheck.livenessProbe.enabled }}
+          livenessProbe:
+            {{- with .Values.admissionController.healthCheck.livenessProbe.httpGet }}
+            httpGet:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.admissionController.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admissionController.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admissionController.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admissionController.healthCheck.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.admissionController.healthCheck.readinessProbe.enabled }}
+          readinessProbe:
+            {{- with .Values.admissionController.healthCheck.readinessProbe.httpGet }}
+            httpGet:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.admissionController.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admissionController.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.admissionController.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.admissionController.healthCheck.readinessProbe.failureThreshold }}
+          {{- end }}
           volumeMounts:
             - name: certs
               mountPath: /etc/certs
