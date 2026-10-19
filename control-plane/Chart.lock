@@ -4,6 +4,6 @@ dependencies:
   version: 16.7.27
 - name: reshapr-web-ui
   repository: file://../web-ui
-  version: 0.0.14
-digest: sha256:ffa9b5944a96c011b89416398175d2c7fad4609014d5ffd3895d5abc4dab9a7e
-generated: "2026-09-22T07:24:55.590457196Z"
+  version: 0.0.15
+digest: sha256:51051b4aa6ddd6346b5bf6c5ce5b3a0dbabc94637986bd17f4cfeeee0f6959f0
+generated: "2026-10-19T09:51:54.7390579Z"
