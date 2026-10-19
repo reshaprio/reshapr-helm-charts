@@ -1,0 +1,22 @@
+{{- if .Values.operator.enabled }}
+{{- if .Values.operator.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "controllers.fullname" . }}-operator
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: operator
+spec:
+  {{- if .Values.operator.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.operator.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.operator.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.operator.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "controllers.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: operator
+{{- end }}
+{{- end }}
