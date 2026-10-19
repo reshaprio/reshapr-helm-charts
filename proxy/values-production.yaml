@@ -5,7 +5,7 @@ replicaCount: 3
 
 image:
   repository: registry.reshapr.io/reshapr/reshapr-proxy
-  tag: "0.1.0"  # Use specific version tag
+  tag: "1.1.0"  # Use specific version tag
   pullPolicy: IfNotPresent
 
 resources:

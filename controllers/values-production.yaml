@@ -7,7 +7,7 @@ operator:
   image:
     # Use specific image tags instead of nightly in production
     repository: registry.reshapr.io/reshapr/reshapr-operator
-    tag: "0.0.3"
+    tag: "0.0.4"
     pullPolicy: IfNotPresent
 
   resources:

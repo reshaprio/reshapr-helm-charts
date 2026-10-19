@@ -8,7 +8,7 @@ ctrl:
 
   image:
     repository: registry.reshapr.io/reshapr/reshapr-ctrl
-    tag: "0.1.0"  # Use specific version tag
+    tag: "1.1.0"  # Use specific version tag
     pullPolicy: IfNotPresent
 
   resources:

@@ -4,7 +4,7 @@ replicaCount: 2
 
 image:
   repository: registry.reshapr.io/reshapr/reshapr-web-ui
-  tag: "0.1.0"
+  tag: "1.1.0"
   pullPolicy: IfNotPresent
 
 resources:
