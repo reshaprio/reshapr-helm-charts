@@ -77,6 +77,8 @@ admissionController:
     tag: "nightly"
     # -- Image pull policy
     pullPolicy: IfNotPresent
+  # -- Extra environment variables to inject into the admission webhook container
+  extraEnv: []
   service:
     # -- Type of the admission webhook Service
     type: ClusterIP

@@ -76,6 +76,9 @@ spec:
                   key: {{ $cert.existing.passwordKey }}
                   {{- end }}
             {{- end }}
+            {{- with .Values.admissionController.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.admissionController.httpContainerPort }}

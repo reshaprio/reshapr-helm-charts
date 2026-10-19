@@ -287,6 +287,7 @@ for a fully OpenShift-native install.
 | `admissionController.image.repository`             | Image repository                              | `registry.reshapr.io/reshapr/reshapr-admission` |
 | `admissionController.image.tag`                    | Image tag (defaults to chart appVersion when empty) | `""` |
 | `admissionController.image.pullPolicy`             | Image pull policy                             | `IfNotPresent` |
+| `admissionController.extraEnv`                     | Extra environment variables                   | `[]`    |
 | `admissionController.service.type`                 | Service type                                  | `ClusterIP` |
 | `admissionController.service.httpPort`             | Service HTTP port                             | `80`    |
 | `admissionController.service.httpsPort`            | Service HTTPS port (called by the API server) | `443`   |
