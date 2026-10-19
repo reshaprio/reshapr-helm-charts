@@ -88,8 +88,7 @@ spec:
                     type: "object"
                   response:
                     description: "Allow/deny/rename directives applied to headers\
-                      \ returned from the backend. Reserved for future use, not enforced\
-                      \ yet."
+                      \ returned from the backend."
                     properties:
                       allow:
                         description: "Header names explicitly allowed to be propagated.\
@@ -147,6 +146,14 @@ spec:
                       \ custom tools."
                     type: "string"
                 type: "object"
+              toolExposureMode:
+                description: "How the gateway advertises the exposed operations to\
+                  \ MCP clients. When absent, TOOLS applies."
+                enum:
+                - "CODE"
+                - "HYBRID"
+                - "TOOLS"
+                type: "string"
             type: "object"
           status:
             properties:

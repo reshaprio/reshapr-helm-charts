@@ -12,6 +12,7 @@ CRDS=(
   customtools.reshapr.io-v1.yml
   expositions.reshapr.io-v1.yml
   gatewaygroups.reshapr.io-v1.yml
+  prompts.reshapr.io-v1.yml
   resources.reshapr.io-v1.yml
   secretsources.reshapr.io-v1.yml
   services.reshapr.io-v1.yml
