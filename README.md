@@ -31,8 +31,8 @@ Current development version is `0.0.16`.
 ## Overview
 
 These charts install the runtime components of [reShapr](https://github.com/reshaprio/reshapr), a
-no-code MCP (Model Context Protocol) server that turns REST/GraphQL/gRPC APIs into LLM-friendly
-tools. Each component ships as its own chart so you can install only what you need.
+runtime that turns REST/GraphQL/gRPC APIs into governed, LLM-friendly MCP (Model Context Protocol)
+tools, without rebuilding them. Each component ships as its own chart so you can install only what you need.
 
 ```mermaid
 flowchart LR
