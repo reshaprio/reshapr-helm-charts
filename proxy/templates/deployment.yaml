@@ -1,4 +1,3 @@
-{{- if not .Values.autoscaling.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +6,9 @@ metadata:
   labels:
     {{- include "reshapr-proxy.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "reshapr-proxy.selectorLabels" . | nindent 6 }}
@@ -185,4 +186,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{- end }}

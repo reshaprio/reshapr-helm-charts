@@ -49,6 +49,16 @@ jobs:
       - name: Helm lint
         run: helm lint "./${{ matrix.chart }}"
 
+      - name: Test proxy Deployment variants
+        if: matrix.chart == 'proxy'
+        run: |
+          YQ_VERSION=v4.44.3
+          curl --fail --silent --show-error --location \
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" \
+            --output "$RUNNER_TEMP/yq"
+          chmod +x "$RUNNER_TEMP/yq"
+          PATH="$RUNNER_TEMP:$PATH" bash proxy/test-chart.sh
+
       - name: Install kubeconform
         run: |
           KUBECONFORM_VERSION=v0.6.7
