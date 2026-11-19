@@ -146,7 +146,8 @@ helm install reshapr-control-plane oci://quay.io/reshapr/reshapr-helm-charts/res
   --set postgresql.enabled=true \
   --set postgresql.auth.password=admin \
   --set apiKey.value=dev-api-key-change-me-in-production \
-  --set encryptionKey.value=dev-encryption-key-change-me-in-production \
+  --set encryptionKey.activeKeyId=v1 \
+  --set encryptionKey.keys.v1.value=ZGV2LWVuY3J5cHRpb24ta2V5LWNoYW5nZS1tZS0zMmI= \
   --set admin.nameValue=admin \
   --set admin.passwordValue=password \
   --set admin.emailValue=reshapr@example.com \
