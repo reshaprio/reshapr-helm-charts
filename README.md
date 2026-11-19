@@ -11,9 +11,9 @@ Helm Charts for installing reShapr components on Kubernetes
 
 ## Build Status
 
-Latest released version is `0.0.16`.
+Latest released version is `0.0.17`.
 
-Current development version is `0.0.17`.
+Current development version is `0.0.18`.
 
 ## Table of Contents
 
