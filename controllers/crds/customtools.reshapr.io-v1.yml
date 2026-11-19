@@ -79,6 +79,10 @@ spec:
                   type: "object"
                 description: "The custom tools are defined with name as key."
                 type: "object"
+              keepOnDelete:
+                description: "Flag to keep artifact in control plane when deleting this\
+                  \ resource. Default is false"
+                type: "boolean"
               service:
                 description: "Holds reference information about this Service custom\
                   \ tools relate."

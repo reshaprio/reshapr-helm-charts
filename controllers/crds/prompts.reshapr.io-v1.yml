@@ -19,6 +19,10 @@ spec:
         properties:
           spec:
             properties:
+              keepOnDelete:
+                description: "Flag to keep artifact in control plane when deleting this\
+                  \ resource. Default is false"
+                type: "boolean"
               prompts:
                 additionalProperties:
                   properties:

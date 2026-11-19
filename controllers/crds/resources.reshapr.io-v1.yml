@@ -19,6 +19,10 @@ spec:
         properties:
           spec:
             properties:
+              keepOnDelete:
+                description: "Flag to keep artifact in control plane when deleting\
+                  \ this resource. Default is false."
+                type: "boolean"
               resourceTemplates:
                 additionalProperties:
                   properties:
@@ -66,6 +70,14 @@ spec:
                       type: "string"
                     name:
                       description: "The name of this resource template."
+                      type: "string"
+                    remoteContent:
+                      description: "The remote URI where this resource template content\
+                        \ can be found, if applicable."
+                      type: "string"
+                    remoteSecret:
+                      description: "The name of an existing reShapr Secret used to\
+                        \ authenticate remoteContent fetches, if applicable."
                       type: "string"
                     title:
                       description: "Human readable title of this resource template."
@@ -128,6 +140,10 @@ spec:
                       description: "The remote URI where this resource content can\
                         \ be found, if applicable. Mutually exclusive with text and\
                         \ blob."
+                      type: "string"
+                    remoteSecret:
+                      description: "The name of an existing reShapr Secret used to\
+                        \ authenticate remoteContent fetches, if applicable."
                       type: "string"
                     size:
                       description: "The size of this resource in bytes."

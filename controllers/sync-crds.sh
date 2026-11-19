@@ -16,6 +16,7 @@ CRDS=(
   resources.reshapr.io-v1.yml
   secretsources.reshapr.io-v1.yml
   services.reshapr.io-v1.yml
+  toolsoutputfilters.reshapr.io-v1.yml
 )
 
 echo "Fetching CRDs from reshapr-controllers@${REF} ..."
