@@ -1,0 +1,22 @@
+{{- if .Values.admissionController.enabled }}
+{{- if .Values.admissionController.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "controllers.fullname" . }}-admission
+  labels:
+    {{- include "controllers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission
+spec:
+  {{- if .Values.admissionController.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.admissionController.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.admissionController.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.admissionController.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "controllers.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: admission
+{{- end }}
+{{- end }}

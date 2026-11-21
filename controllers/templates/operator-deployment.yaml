@@ -49,6 +49,32 @@ spec:
             {{- with .Values.operator.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.operator.healthCheck.livenessProbe.enabled }}
+          livenessProbe:
+            {{- with .Values.operator.healthCheck.livenessProbe.httpGet }}
+            httpGet:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.operator.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.operator.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.operator.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.operator.healthCheck.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.operator.healthCheck.readinessProbe.enabled }}
+          readinessProbe:
+            {{- with .Values.operator.healthCheck.readinessProbe.httpGet }}
+            httpGet:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.operator.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.operator.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.operator.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.operator.healthCheck.readinessProbe.failureThreshold }}
+          {{- end }}
           volumeMounts:
             - name: sa-token
               mountPath: /var/run/secrets/reshapr/serviceaccount
